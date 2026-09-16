@@ -14,8 +14,23 @@ function createClient() {
   return new PrismaClient({ adapter });
 }
 
-export const prisma = globalThis.__prisma ?? createClient();
+function getClient() {
+  const client = globalThis.__prisma ?? createClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalThis.__prisma = prisma;
+  if (process.env.NODE_ENV !== "production") {
+    globalThis.__prisma = client;
+  }
+
+  return client;
 }
+
+/**
+ * Defers reading DATABASE_URL until a query is actually made. This keeps Next's
+ * build-time route analysis independent of runtime-only database configuration.
+ */
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, property) {
+    const value = Reflect.get(getClient(), property);
+    return typeof value === "function" ? value.bind(getClient()) : value;
+  },
+});

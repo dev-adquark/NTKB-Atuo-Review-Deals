@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { prisma } from "@/lib/db";
 import { buildCanonicalUrl } from "@/lib/seo/canonical";
 import { buildWebsiteJsonLd } from "@/lib/seo/jsonld";
@@ -7,10 +8,6 @@ import { buildWebsiteJsonLd } from "@/lib/seo/jsonld";
 const SITE_NAME = "NTKB Auto Review Deals";
 const SITE_DESCRIPTION =
   "Independent, region-aware reviews and top picks — with clear affiliate disclosure on every monetized page.";
-
-// Without this, Next statically prerenders "/" once at build time (before any
-// pages are published) and never picks up newly published content.
-export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const canonical = buildCanonicalUrl("/");
@@ -24,6 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
+  // The homepage reflects database-backed publishing state, so render it only
+  // after a request arrives instead of querying during a deployment build.
+  await connection();
+
   const [regions, featured] = await Promise.all([
     prisma.region.findMany({ where: { active: true }, orderBy: { code: "asc" } }),
     prisma.generatedPage.findMany({

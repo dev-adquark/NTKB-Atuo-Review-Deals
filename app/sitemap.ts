@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
 import { prisma } from "@/lib/db";
 import { buildCanonicalUrl } from "@/lib/seo/canonical";
 
@@ -7,6 +8,8 @@ import { buildCanonicalUrl } from "@/lib/seo/canonical";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  await connection();
+
   const [regions, pages] = await Promise.all([
     prisma.region.findMany({ where: { active: true } }),
     prisma.generatedPage.findMany({
