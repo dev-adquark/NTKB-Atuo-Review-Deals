@@ -1,0 +1,296 @@
+// NTKB Auto Review Deals — core data model
+// See docs/ARCHITECTURE.md for the orchestration flow this schema supports.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum RegionCode {
+  US
+  EU
+  AU
+  IN
+}
+
+enum PageType {
+  KEYWORD_REVIEW
+  BRAND_REVIEW
+  TOP_PICKS
+}
+
+enum KeywordStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum AffiliateSource {
+  ADMIN
+  NETWORK
+}
+
+enum GenerationStatus {
+  QUEUED
+  GENERATING
+  GENERATED
+  VALIDATING
+  FAILED
+  REJECTED
+}
+
+enum PageStatus {
+  DRAFT
+  GENERATED
+  READY_FOR_REVIEW
+  APPROVED
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum GscStatus {
+  QUEUED
+  SUCCESS
+  FAILED
+}
+
+model AdminUser {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime   @default(now())
+  auditLogs    AuditLog[]
+}
+
+model Region {
+  id        String     @id @default(cuid())
+  code      RegionCode @unique
+  name      String
+  language  String
+  urlPrefix String     @unique
+  currency  String
+  active    Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  keywords       Keyword[]
+  brandRankings  BrandRanking[]
+  affiliateMaps  AffiliateMapping[]
+  sponsored      SponsoredPlacement[]
+  generationJobs GenerationJob[]
+  generatedPages GeneratedPage[]
+}
+
+model Brand {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rankings            BrandRanking[]
+  affiliateMaps       AffiliateMapping[]
+  sponsoredPlacements SponsoredPlacement[]
+  generationJobs      GenerationJob[]
+  generatedPages      GeneratedPage[]
+}
+
+model Keyword {
+  id             String        @id @default(cuid())
+  text           String
+  slug           String
+  category       String?
+  regionId       String
+  region         Region        @relation(fields: [regionId], references: [id])
+  pageType       PageType
+  priority       Int           @default(0)
+  status         KeywordStatus @default(ACTIVE)
+  targetBrandIds String[]      @default([])
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  generationJobs GenerationJob[]
+  generatedPages GeneratedPage[]
+
+  @@unique([regionId, slug])
+}
+
+model BrandRanking {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id])
+  regionId  String
+  region    Region   @relation(fields: [regionId], references: [id])
+  rank      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([brandId, regionId])
+}
+
+model AffiliateMapping {
+  id        String          @id @default(cuid())
+  brandId   String
+  brand     Brand           @relation(fields: [brandId], references: [id])
+  regionId  String
+  region    Region          @relation(fields: [regionId], references: [id])
+  url       String
+  source    AffiliateSource @default(ADMIN)
+  active    Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([brandId, regionId])
+}
+
+model SponsoredPlacement {
+  id           String   @id @default(cuid())
+  sponsorName  String
+  sponsorLabel String   @default("Sponsored — Brand Spotlight")
+  disclosure   String
+  brandId      String
+  brand        Brand    @relation(fields: [brandId], references: [id])
+  regionId     String
+  region       Region   @relation(fields: [regionId], references: [id])
+  link         String
+  imageUrl     String?
+  ctaLabel     String?
+  startDate    DateTime
+  endDate      DateTime
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Single-row table holding the external Content Generation Engine configuration.
+// apiKeyEncrypted is AES-256-GCM encrypted with CONTENT_ENGINE_ENCRYPTION_KEY and is never sent to the client.
+model ContentEngineConfig {
+  id                 String   @id @default("singleton")
+  providerName       String   @default("Content Generation Engine")
+  apiBaseUrl         String   @default("")
+  generationEndpoint String   @default("/v1/generate")
+  apiKeyEncrypted    String?
+  authMethod         String   @default("bearer")
+  apiVersion         String?
+  timeoutMs          Int      @default(30000)
+  retryCount         Int      @default(2)
+  customHeaders      Json?
+  webhookUrl         String?
+  mockMode           Boolean  @default(true)
+  enabled            Boolean  @default(false)
+  updatedAt          DateTime @updatedAt
+}
+
+model GenerationJob {
+  id              String            @id @default(cuid())
+  keywordId       String?
+  keyword         Keyword?          @relation(fields: [keywordId], references: [id])
+  brandId         String?
+  brand           Brand?            @relation(fields: [brandId], references: [id])
+  regionId        String
+  region          Region            @relation(fields: [regionId], references: [id])
+  pageType        PageType
+  status          GenerationStatus  @default(QUEUED)
+  configVersion   String
+  requestPayload  Json
+  responsePayload Json?
+  requestId       String?
+  apiVersion      String?
+  errorCode       String?
+  errorMessage    String?
+  createdAt       DateTime          @default(now())
+  completedAt     DateTime?
+
+  generatedPages GeneratedPage[]
+
+  @@index([status])
+  @@index([regionId, pageType])
+}
+
+// One row per generated version of a page. Never deleted or overwritten — publishing creates a new version.
+model GeneratedPage {
+  id               String     @id @default(cuid())
+  generationJobId  String
+  generationJob    GenerationJob @relation(fields: [generationJobId], references: [id])
+  keywordId        String?
+  keyword          Keyword?   @relation(fields: [keywordId], references: [id])
+  brandId          String?
+  brand            Brand?     @relation(fields: [brandId], references: [id])
+  regionId         String
+  region           Region     @relation(fields: [regionId], references: [id])
+  pageType         PageType
+  version          Int
+  title            String
+  slug             String
+  metaDescription  String
+  canonicalPath    String
+  content          Json
+  seo              Json
+  internalLinks    Json?
+  contentHash      String
+  uniquenessScore  Float?
+  status           PageStatus @default(DRAFT)
+  validationReport Json?
+  isCurrent        Boolean    @default(false)
+  publishedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  gscSubmissions GSCSubmission[]
+
+  @@index([regionId, pageType, keywordId, brandId])
+  @@index([regionId, slug])
+  @@index([status])
+}
+
+// Single-row table of platform-wide generation/publishing safety settings (spec section 64/118/119).
+model PlatformSettings {
+  id                      String   @id @default("singleton")
+  uniquenessMinScore      Float    @default(0.35)
+  maxRepeatedSectionPct   Float    @default(0.5)
+  batchSize               Int      @default(10)
+  maxConcurrency          Int      @default(2)
+  dailyGenerationLimit    Int      @default(50)
+  autoPublish             Boolean  @default(false)
+  requireAffiliateMapping Boolean  @default(true)
+  networkFallbackEnabled  Boolean  @default(false)
+  gscHardGate             Boolean  @default(false)
+  maxGscRetries           Int      @default(5)
+  updatedAt               DateTime @updatedAt
+}
+
+model GSCSubmission {
+  id              String        @id @default(cuid())
+  generatedPageId String
+  generatedPage   GeneratedPage @relation(fields: [generatedPageId], references: [id])
+  url             String
+  status          GscStatus     @default(QUEUED)
+  queuedAt        DateTime      @default(now())
+  submittedAt     DateTime?
+  response        Json?
+  error           String?
+  retryCount      Int           @default(0)
+
+  @@index([status])
+}
+
+model AuditLog {
+  id         String     @id @default(cuid())
+  userId     String?
+  user       AdminUser? @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
