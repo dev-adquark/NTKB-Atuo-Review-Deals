@@ -19,7 +19,12 @@ export default async function AdminContentEnginePage() {
         <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
           Mock mode is ON. Generated pages will contain clearly-labeled placeholder content, not real API output.
         </p>
-      ) : null}
+      ) : (
+        <p className="rounded-md border border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-800">
+          Mock mode is OFF — generation calls the real Content Generation Engine below and will consume its request
+          quota. Check the plan&rsquo;s daily/per-minute limits (returned in 429 responses) before running a batch.
+        </p>
+      )}
 
       <form action={updateContentEngineSettingsAction} className="space-y-4 rounded-lg border border-neutral-200 bg-white p-4">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -36,17 +41,37 @@ export default async function AdminContentEnginePage() {
               className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm"
             />
           </div>
+          <Field label="Timeout (ms)" name="timeoutMs" type="number" defaultValue={String(config.timeoutMs)} />
           <div>
-            <p className="text-xs text-neutral-500">Auth method</p>
-            <select name="authMethod" defaultValue={config.authMethod} className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm">
-              <option value="bearer">Bearer token</option>
-              <option value="api-key-header">X-API-Key header</option>
+            <p className="text-xs text-neutral-500">Retry count (each retry consumes another request against quota)</p>
+            <input
+              name="retryCount"
+              type="number"
+              defaultValue={String(config.retryCount)}
+              className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div>
+            <p className="text-xs text-neutral-500">Tone</p>
+            <select name="defaultTone" defaultValue={config.defaultTone} className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm">
+              <option value="professional">Professional</option>
+              <option value="friendly">Friendly</option>
+              <option value="bold">Bold</option>
             </select>
           </div>
-          <Field label="API version (optional)" name="apiVersion" defaultValue={config.apiVersion ?? ""} />
-          <Field label="Timeout (ms)" name="timeoutMs" type="number" defaultValue={String(config.timeoutMs)} />
-          <Field label="Retry count" name="retryCount" type="number" defaultValue={String(config.retryCount)} />
+          <Field label="Max words per generation" name="defaultMaxWords" type="number" defaultValue={String(config.defaultMaxWords)} />
+          <div>
+            <p className="text-xs text-neutral-500">Factuality mode</p>
+            <select name="factualityMode" defaultValue={config.factualityMode} className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm">
+              <option value="standard">Standard</option>
+              <option value="verified">Verified</option>
+            </select>
+          </div>
         </div>
+
         <div className="flex flex-wrap gap-6">
           <label className="flex items-center gap-2 text-sm text-neutral-700">
             <input type="checkbox" name="mockMode" defaultChecked={config.mockMode} className="h-4 w-4" />

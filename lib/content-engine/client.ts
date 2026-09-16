@@ -1,6 +1,7 @@
 import "server-only";
+import { randomUUID } from "node:crypto";
 import { generateMockContent } from "./mock-provider";
-import { generatedContentResultSchema, unwrapExternalResponse } from "./schema";
+import { buildKeywordToBlogRequestBody, mapKeywordToBlogError, parseKeywordToBlogSuccess } from "./providers/keyword-to-blog";
 import type {
   ContentEngineCallResult,
   ContentEngineErrorInfo,
@@ -8,22 +9,14 @@ import type {
   GenerationRequest,
 } from "./types";
 
-const RETRYABLE_STATUSES = new Set([429, 502, 503, 504]);
-
-function buildHeaders(config: ContentEngineRuntimeConfig): Record<string, string> {
+function buildHeaders(config: ContentEngineRuntimeConfig, idempotencyKey: string, requestId: string): Record<string, string> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
+    Authorization: `Bearer ${config.apiKey}`,
+    "Idempotency-Key": idempotencyKey,
+    "X-Request-ID": requestId,
     ...(config.customHeaders ?? {}),
   };
-  if (config.authMethod === "api-key-header") {
-    headers["X-API-Key"] = config.apiKey;
-  } else {
-    // default: bearer
-    headers["Authorization"] = `Bearer ${config.apiKey}`;
-  }
-  if (config.apiVersion) {
-    headers["X-Content-Engine-Version"] = config.apiVersion;
-  }
   return headers;
 }
 
@@ -36,9 +29,10 @@ async function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Calls the external Content Generation Engine (or the mock provider when mockMode is
- * on) and normalizes the result. All network calls happen here, server-side only —
- * never call the external API from client code.
+ * Calls the external Content Generation Engine (the real Keyword-to-Blog API, or
+ * the mock provider when mockMode is on) and normalizes the result. All network
+ * calls happen here, server-side only — never call the external API from client
+ * code, and the API key never leaves this module.
  */
 export async function callContentEngine(
   request: GenerationRequest,
@@ -83,8 +77,14 @@ export async function callContentEngine(
   }
 
   const url = `${config.apiBaseUrl.replace(/\/$/, "")}${config.generationEndpoint}`;
-  const headers = buildHeaders(config);
-  const body = JSON.stringify(request);
+  // Stable across retries of this same logical attempt: replaying with the same
+  // Idempotency-Key returns the original job/result instead of double-generating
+  // (the API docs guarantee this), which matters a lot given how tight this
+  // API's request quota is.
+  const idempotencyKey = randomUUID();
+  const clientRequestId = randomUUID();
+  const headers = buildHeaders(config, idempotencyKey, clientRequestId);
+  const body = JSON.stringify(buildKeywordToBlogRequestBody(request, config));
 
   let attempt = 0;
   const maxAttempts = Math.max(1, config.retryCount + 1);
@@ -103,39 +103,9 @@ export async function callContentEngine(
       });
       clearTimeout(timeout);
 
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          return errorResult(
-            {
-              code: "CONTENT_API_AUTH_FAILED",
-              message: `Content Generation Engine rejected the API key (HTTP ${response.status}).`,
-              httpStatus: response.status,
-              retryable: false,
-            },
-            Date.now() - startedAt,
-          );
-        }
-
-        if (RETRYABLE_STATUSES.has(response.status) && attempt < maxAttempts) {
-          await sleep(backoffDelay(attempt));
-          continue;
-        }
-
-        const code = response.status === 429 ? "CONTENT_API_RATE_LIMITED" : "CONTENT_API_SERVER_ERROR";
-        return errorResult(
-          {
-            code,
-            message: `Content Generation Engine returned HTTP ${response.status}.`,
-            httpStatus: response.status,
-            retryable: RETRYABLE_STATUSES.has(response.status),
-          },
-          Date.now() - startedAt,
-        );
-      }
-
-      let raw: unknown;
+      let rawBody: unknown;
       try {
-        raw = await response.json();
+        rawBody = await response.json();
       } catch {
         return errorResult(
           {
@@ -148,35 +118,28 @@ export async function callContentEngine(
         );
       }
 
-      const parsed = generatedContentResultSchema.safeParse(unwrapExternalResponse(raw));
-      if (!parsed.success) {
-        return errorResult(
-          {
-            code: "CONTENT_API_INVALID_RESPONSE",
-            message: `Generated response failed schema validation: ${parsed.error.issues
-              .map((i) => `${i.path.join(".")}: ${i.message}`)
-              .join("; ")}`,
-            httpStatus: response.status,
-            retryable: false,
-          },
-          Date.now() - startedAt,
-        );
+      if (!response.ok) {
+        const error = mapKeywordToBlogError(response.status, rawBody);
+        if (error.retryable && attempt < maxAttempts) {
+          await sleep(error.retryAfterMs ?? backoffDelay(attempt));
+          continue;
+        }
+        return errorResult(error, Date.now() - startedAt);
       }
 
-      const requestId =
-        parsed.data.requestId ??
-        (typeof raw === "object" && raw !== null && "requestId" in raw
-          ? String((raw as Record<string, unknown>).requestId)
-          : `unknown-${Date.now()}`);
+      const parsed = parseKeywordToBlogSuccess(rawBody);
+      if (!parsed.ok) {
+        return errorResult(parsed.error, Date.now() - startedAt);
+      }
 
       return {
         ok: true,
-        result: parsed.data,
-        requestId,
-        apiVersion: config.apiVersion ?? "unknown",
+        result: parsed.result,
+        requestId: parsed.requestId,
+        apiVersion: config.apiVersion ?? "v1",
         httpStatus: response.status,
         durationMs: Date.now() - startedAt,
-        raw,
+        raw: rawBody,
       };
     } catch (error) {
       clearTimeout(timeout);

@@ -19,12 +19,14 @@ export default async function AdminSettingsPage() {
           <NumberField label="Max concurrency" name="maxConcurrency" defaultValue={settings.maxConcurrency} />
           <NumberField label="Daily generation limit" name="dailyGenerationLimit" defaultValue={settings.dailyGenerationLimit} />
           <NumberField label="Max GSC retries" name="maxGscRetries" defaultValue={settings.maxGscRetries} />
+          <NumberField label="Refresh pages older than (days)" name="refreshEligibleDays" defaultValue={settings.refreshEligibleDays} />
         </div>
         <div className="flex flex-wrap gap-6">
           <Checkbox label="Auto-publish after validation passes" name="autoPublish" defaultChecked={settings.autoPublish} />
           <Checkbox label="Require affiliate mapping to publish" name="requireAffiliateMapping" defaultChecked={settings.requireAffiliateMapping} />
-          <Checkbox label="Enable affiliate network fallback (not yet implemented)" name="networkFallbackEnabled" defaultChecked={settings.networkFallbackEnabled} />
+          <Checkbox label="Enable affiliate network fallback" name="networkFallbackEnabled" defaultChecked={settings.networkFallbackEnabled} />
           <Checkbox label="Hard-gate publish on GSC availability" name="gscHardGate" defaultChecked={settings.gscHardGate} />
+          <Checkbox label="Enable scheduled (cron) content refresh" name="refreshEnabled" defaultChecked={settings.refreshEnabled} />
         </div>
         <button type="submit" className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800">
           Save

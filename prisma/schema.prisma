@@ -185,6 +185,10 @@ model ContentEngineConfig {
   webhookUrl         String?
   mockMode           Boolean  @default(true)
   enabled            Boolean  @default(false)
+  // Keyword-to-Blog API generation parameters (spec section 3) — admin-configurable.
+  defaultTone        String   @default("professional")
+  defaultMaxWords    Int      @default(600)
+  factualityMode     String   @default("standard")
   updatedAt          DateTime @updatedAt
 }
 
@@ -240,6 +244,7 @@ model GeneratedPage {
   validationReport Json?
   isCurrent        Boolean    @default(false)
   publishedAt      DateTime?
+  lastRefreshAttemptAt DateTime?
   createdAt        DateTime   @default(now())
   updatedAt        DateTime   @updatedAt
 
@@ -263,6 +268,8 @@ model PlatformSettings {
   networkFallbackEnabled  Boolean  @default(false)
   gscHardGate             Boolean  @default(false)
   maxGscRetries           Int      @default(5)
+  refreshEnabled          Boolean  @default(false)
+  refreshEligibleDays     Int      @default(90)
   updatedAt               DateTime @updatedAt
 }
 

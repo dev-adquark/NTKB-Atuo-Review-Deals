@@ -43,6 +43,17 @@ export default async function HomePage() {
       <section>
         <h1 className="text-3xl font-semibold text-neutral-900">{SITE_NAME}</h1>
         <p className="mt-3 max-w-2xl text-neutral-600">{SITE_DESCRIPTION}</p>
+        <form action="/search" method="get" className="mt-5 flex max-w-md gap-2">
+          <input
+            type="search"
+            name="q"
+            placeholder="Search reviews and deals…"
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          />
+          <button type="submit" className="rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-800 hover:bg-neutral-50">
+            Search
+          </button>
+        </form>
       </section>
 
       <section className="mt-10">

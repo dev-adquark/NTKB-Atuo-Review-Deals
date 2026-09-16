@@ -93,19 +93,28 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
     : null;
   const brand = input.brandId ? await prisma.brand.findUniqueOrThrow({ where: { id: input.brandId } }) : null;
 
+  const engineConfig = await getContentEngineRuntimeConfig();
+
+  // The real Keyword-to-Blog API has no request-time flags to force FAQ/pros-cons/
+  // comparison inclusion — whatever its own model produces is what it produces, and
+  // its own `quality` verdict (checked below) is the trust signal for that content.
+  // Only the mock provider honors these "include" flags deterministically, so only
+  // require them from mock-generated content.
   const request: GenerationRequest = {
     pageType: toExternalPageType(input.pageType),
     keyword: keyword?.text ?? brand?.name ?? "",
     brand: brand?.name ?? null,
     region: region.code,
     language: region.language,
-    configuration: {
-      tone: "informational",
-      format: "affiliate-review",
-      includeFaq: true,
-      includeProsCons: true,
-      includeComparison: input.pageType !== "BRAND_REVIEW",
-    },
+    configuration: engineConfig.mockMode
+      ? {
+          tone: "informational",
+          format: "affiliate-review",
+          includeFaq: true,
+          includeProsCons: true,
+          includeComparison: input.pageType !== "BRAND_REVIEW",
+        }
+      : undefined,
   };
 
   const configVersion = "1.0.0";
@@ -123,7 +132,6 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
 
   await logAudit({ userId: input.userId, action: "generation.requested", entityType: "GenerationJob", entityId: job.id, metadata: { request } as unknown as Prisma.InputJsonValue });
 
-  const engineConfig = await getContentEngineRuntimeConfig();
   const callResult = await callContentEngine(request, engineConfig);
 
   if (!callResult.ok) {

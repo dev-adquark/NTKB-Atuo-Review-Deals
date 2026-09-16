@@ -23,6 +23,9 @@ export async function updateContentEngineSettingsAction(formData: FormData): Pro
     retryCount: Number(formData.get("retryCount") ?? 2) || 0,
     mockMode: formData.get("mockMode") === "on",
     enabled: formData.get("enabled") === "on",
+    defaultTone: String(formData.get("defaultTone") ?? "professional"),
+    defaultMaxWords: Number(formData.get("defaultMaxWords") ?? 600) || 600,
+    factualityMode: String(formData.get("factualityMode") ?? "standard"),
   });
 
   await logAudit({ userId: session.sub, action: "content-engine.config.updated", entityType: "ContentEngineConfig" });

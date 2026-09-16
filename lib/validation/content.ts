@@ -42,6 +42,16 @@ export function validateGeneratedContent(
     }
   }
 
+  // Trust the external provider's own quality-pipeline verdict when it reports one
+  // (e.g. Keyword-to-Blog's quality.status/score) — a provider that already rejected
+  // its own output as sub-standard should never be treated as publishable.
+  if (result.qualityStatus && result.qualityStatus !== "pass") {
+    issues.push({
+      code: "CONTENT_QUALITY_FAILED",
+      message: `Content Generation Engine reported quality status "${result.qualityStatus}"${result.qualityScore !== undefined ? ` (score ${result.qualityScore})` : ""}.`,
+    });
+  }
+
   const flatText = joinContentText(result);
   for (const flag of scanForProhibitedClaims(flatText)) {
     issues.push({

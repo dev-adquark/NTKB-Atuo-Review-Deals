@@ -66,6 +66,17 @@ describe("validateGeneratedContent", () => {
     const issues = validateGeneratedContent(result, baseRequest);
     expect(issues.some((i) => i.code === "PROHIBITED_CLAIM")).toBe(true);
   });
+
+  it("trusts the external provider's own quality verdict when it reports a failure", () => {
+    const result = { ...validResult(), qualityStatus: "revision_exhausted", qualityScore: 40 };
+    const issues = validateGeneratedContent(result, baseRequest);
+    expect(issues.some((i) => i.code === "CONTENT_QUALITY_FAILED")).toBe(true);
+  });
+
+  it("does not flag quality when the provider reports pass (or reports nothing)", () => {
+    expect(validateGeneratedContent({ ...validResult(), qualityStatus: "pass" }, baseRequest)).toEqual([]);
+    expect(validateGeneratedContent(validResult(), baseRequest)).toEqual([]);
+  });
 });
 
 describe("validatePlaceholdersResolved", () => {

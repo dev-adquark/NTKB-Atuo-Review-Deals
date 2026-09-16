@@ -223,6 +223,8 @@ export function generateMockContent(request: GenerationRequest): GeneratedConten
       keywords: [request.keyword],
     },
     coverageNotes: [MOCK_NOTICE],
+    qualityStatus: "pass",
+    qualityScore: 100,
     mock: true,
   };
 }

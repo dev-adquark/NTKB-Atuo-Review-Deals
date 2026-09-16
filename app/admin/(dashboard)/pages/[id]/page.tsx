@@ -6,6 +6,7 @@ import { pageTypeLabel } from "@/lib/types/page-type";
 import type { StoredPageContent, StoredSeo, ValidationReport } from "@/lib/publishing/pipeline";
 import { getPreviousVersion, buildPageDiff } from "@/lib/publishing/diff";
 import { retryGscSubmissionAction } from "@/app/admin/(dashboard)/gsc/actions";
+import { Markdown } from "@/components/content/markdown";
 import { PublishPanel } from "./publish-panel";
 
 export default async function AdminPageDetailPage({ params }: PageProps<"/admin/pages/[id]">) {
@@ -173,11 +174,11 @@ export default async function AdminPageDetailPage({ params }: PageProps<"/admin/
 
       <section className="space-y-4 rounded-lg border border-neutral-200 bg-white p-4">
         <h2 className="text-sm font-semibold text-neutral-900">Content preview</h2>
-        {generated.content.intro ? <p className="text-sm text-neutral-700">{generated.content.intro}</p> : null}
+        {generated.content.intro ? <Markdown className="text-sm text-neutral-700">{generated.content.intro}</Markdown> : null}
         {generated.content.sections.map((section, i) => (
           <div key={i}>
             <h3 className="text-sm font-semibold text-neutral-900">{section.heading}</h3>
-            <p className="text-sm text-neutral-700">{section.content}</p>
+            <Markdown className="text-sm text-neutral-700">{section.content}</Markdown>
           </div>
         ))}
         {generated.content.pros && generated.content.cons ? (
@@ -207,13 +208,15 @@ export default async function AdminPageDetailPage({ params }: PageProps<"/admin/
               {generated.content.faq.map((f, i) => (
                 <div key={i}>
                   <dt className="text-sm font-medium text-neutral-900">{f.question}</dt>
-                  <dd className="text-sm text-neutral-700">{f.answer}</dd>
+                  <dd>
+                    <Markdown className="text-sm text-neutral-700">{f.answer}</Markdown>
+                  </dd>
                 </div>
               ))}
             </dl>
           </div>
         ) : null}
-        {generated.content.conclusion ? <p className="text-sm text-neutral-700">{generated.content.conclusion}</p> : null}
+        {generated.content.conclusion ? <Markdown className="text-sm text-neutral-700">{generated.content.conclusion}</Markdown> : null}
       </section>
 
       {page.gscSubmissions.length > 0 ? (

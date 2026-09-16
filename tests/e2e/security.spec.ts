@@ -11,6 +11,8 @@ test.describe("security: auth gating and open-redirect protection", () => {
       "/admin/sponsored",
       "/admin/generation",
       "/admin/pages",
+      "/admin/refresh",
+      "/admin/search",
       "/admin/gsc",
       "/admin/content-engine",
       "/admin/settings",
@@ -26,6 +28,14 @@ test.describe("security: auth gating and open-redirect protection", () => {
 
     const test_ = await request.post("/api/content-engine/test");
     expect(test_.status()).toBe(401);
+  });
+
+  test("the cron-only refresh endpoint rejects requests without the correct shared secret", async ({ request }) => {
+    const noSecret = await request.post("/api/refresh");
+    expect([401, 503]).toContain(noSecret.status()); // 503 if CONTENT_REFRESH_SECRET isn't configured at all
+
+    const wrongSecret = await request.post("/api/refresh", { headers: { "x-refresh-secret": "wrong" } });
+    expect([401, 503]).toContain(wrongSecret.status());
   });
 
   test("click redirect only ever forwards to a real, currently-active affiliate mapping URL", async ({ page, request }) => {

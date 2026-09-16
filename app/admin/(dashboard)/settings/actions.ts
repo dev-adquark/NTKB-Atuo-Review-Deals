@@ -21,10 +21,12 @@ export async function updatePlatformSettingsAction(formData: FormData): Promise<
       maxConcurrency: Number(formData.get("maxConcurrency") ?? 2),
       dailyGenerationLimit: Number(formData.get("dailyGenerationLimit") ?? 50),
       maxGscRetries: Number(formData.get("maxGscRetries") ?? 5),
+      refreshEligibleDays: Number(formData.get("refreshEligibleDays") ?? 90),
       autoPublish: formData.get("autoPublish") === "on",
       requireAffiliateMapping: formData.get("requireAffiliateMapping") === "on",
       networkFallbackEnabled: formData.get("networkFallbackEnabled") === "on",
       gscHardGate: formData.get("gscHardGate") === "on",
+      refreshEnabled: formData.get("refreshEnabled") === "on",
     },
   });
 

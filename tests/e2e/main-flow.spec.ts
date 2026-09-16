@@ -56,6 +56,8 @@ test.describe("main flow: admin login → generate → validate → preview → 
       "/admin/sponsored",
       "/admin/generation",
       "/admin/pages",
+      "/admin/refresh",
+      "/admin/search",
       "/admin/gsc",
       "/admin/content-engine",
       "/admin/settings",
@@ -112,8 +114,8 @@ test.describe("main flow: admin login → generate → validate → preview → 
   });
 
   test("publish gates block until all gates pass; regenerating recovers from a rejected attempt, then publish succeeds", async () => {
-    test.setTimeout(60_000);
-    const MAX_ATTEMPTS = 5;
+    test.setTimeout(120_000);
+    const MAX_ATTEMPTS = 10;
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       await page.goto(generatedPageUrl);

@@ -11,6 +11,8 @@ const NAV_ITEMS = [
   { href: "/admin/sponsored", label: "Sponsored" },
   { href: "/admin/generation", label: "Generation" },
   { href: "/admin/pages", label: "Pages" },
+  { href: "/admin/refresh", label: "Content Freshness" },
+  { href: "/admin/search", label: "Search" },
   { href: "/admin/gsc", label: "Google Search Console" },
   { href: "/admin/content-engine", label: "Content Engine" },
   { href: "/admin/settings", label: "Settings" },

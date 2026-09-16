@@ -2,8 +2,12 @@ import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildFaqJsonLd } from "@/lib
 import { buildCanonicalUrl } from "@/lib/seo/canonical";
 import { getHreflangAlternates } from "@/lib/seo/hreflang";
 import { AffiliateCtaLink } from "@/components/affiliate/affiliate-cta-link";
+import { Markdown } from "@/components/content/markdown";
 import type { StoredPageContent } from "@/lib/publishing/pipeline";
 import type { GeneratedPage, Region, Brand, Keyword } from "@/app/generated/prisma/client";
+
+const MARKDOWN_CLASS =
+  "prose-content mt-2 text-neutral-700 [&_strong]:font-semibold [&_strong]:text-neutral-900 [&_ul]:mt-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mt-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline [&_blockquote]:mt-2 [&_blockquote]:border-l-2 [&_blockquote]:border-neutral-300 [&_blockquote]:pl-3 [&_blockquote]:text-neutral-600 [&_p+p]:mt-3";
 
 type PageWithRelations = GeneratedPage & { region: Region; brand: Brand | null; keyword: Keyword | null };
 
@@ -54,7 +58,7 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
       </nav>
 
       <h1 className="text-2xl font-semibold text-neutral-900 sm:text-3xl">{page.title}</h1>
-      {generated.content.intro ? <p className="mt-4 text-neutral-700">{generated.content.intro}</p> : null}
+      {generated.content.intro ? <Markdown className="mt-4 text-neutral-700">{generated.content.intro}</Markdown> : null}
 
       {content.picks && content.picks.length > 0 ? (
         <section className="mt-6 space-y-3">
@@ -109,7 +113,7 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
             ) : (
               <h3 className="text-base font-semibold text-neutral-900">{section.heading}</h3>
             )}
-            <p className="mt-2 text-neutral-700">{section.content}</p>
+            <Markdown className={MARKDOWN_CLASS}>{section.content}</Markdown>
           </section>
         ))}
       </div>
@@ -156,14 +160,16 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
             {generated.content.faq.map((f, i) => (
               <div key={i}>
                 <dt className="font-medium text-neutral-900">{f.question}</dt>
-                <dd className="text-neutral-700">{f.answer}</dd>
+                <dd>
+                  <Markdown className={MARKDOWN_CLASS}>{f.answer}</Markdown>
+                </dd>
               </div>
             ))}
           </dl>
         </div>
       ) : null}
 
-      {generated.content.conclusion ? <p className="mt-8 text-neutral-700">{generated.content.conclusion}</p> : null}
+      {generated.content.conclusion ? <Markdown className="mt-8 text-neutral-700">{generated.content.conclusion}</Markdown> : null}
 
       <div className="mt-10 space-y-1 border-t border-neutral-200 pt-4 text-xs text-neutral-500">
         {content.disclosures.map((d, i) => (

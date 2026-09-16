@@ -60,6 +60,11 @@ export interface GeneratedContentResult {
   content: GeneratedContentBody;
   seo?: GeneratedContentSeo;
   coverageNotes?: string[];
+  /** The external provider's own quality-pipeline verdict, when it reports one (e.g. the
+   * Keyword-to-Blog API's `quality.status`/`quality.score`). Trusted as an additional
+   * signal alongside NTKB's own validation — never overrides it. */
+  qualityStatus?: string;
+  qualityScore?: number;
   /** Set only by the mock provider. Never true for a real external API response. */
   mock?: boolean;
 }
@@ -68,6 +73,8 @@ export interface ContentEngineErrorInfo {
   code:
     | "CONTENT_API_AUTH_FAILED"
     | "CONTENT_API_RATE_LIMITED"
+    | "CONTENT_API_INVALID_REQUEST"
+    | "CONTENT_API_QUALITY_FAILED"
     | "CONTENT_API_TIMEOUT"
     | "CONTENT_API_INVALID_RESPONSE"
     | "CONTENT_API_SERVER_ERROR"
@@ -77,6 +84,9 @@ export interface ContentEngineErrorInfo {
   httpStatus?: number;
   requestId?: string;
   retryable: boolean;
+  /** When the provider tells us exactly when it's safe to retry (e.g. a 429's
+   * `resetAt`/`retryAfterSeconds`), prefer this over blind exponential backoff. */
+  retryAfterMs?: number;
 }
 
 export type ContentEngineCallResult =
@@ -107,4 +117,8 @@ export interface ContentEngineRuntimeConfig {
   customHeaders?: Record<string, string> | null;
   mockMode: boolean;
   enabled: boolean;
+  /** Keyword-to-Blog API generation parameters (spec section 3) — admin-configurable. */
+  defaultTone: "professional" | "friendly" | "bold";
+  defaultMaxWords: number;
+  factualityMode: "standard" | "verified";
 }

@@ -33,16 +33,34 @@ Stack: Next.js 16 (App Router, TypeScript strict), Tailwind CSS, Prisma 7 + Post
 
 ## Content Generation Engine
 
-Configure the external API under **Admin → Content Engine** (base URL, endpoint, API
-key, auth method, timeout/retries). The API key is encrypted at rest and never sent to
-the browser. Until real credentials are supplied, leave **Mock mode** on — it produces
-clearly-labeled placeholder content so the rest of the pipeline (validation, affiliate
-resolution, SEO, publishing) can be exercised safely. Production must run with mock
-mode off and `CONTENT_ENGINE_MOCK_MODE=false`.
+The real production engine is the **Keyword-to-Blog API**
+(`POST /v1/generate`). The full integration lives in
+`lib/content-engine/providers/keyword-to-blog.ts` (request builder + response
+parser, built from that API's actual documented schema and real captured
+responses/error bodies — not guessed) and is wired through
+`lib/content-engine/client.ts` (timeout, retry with the server's own
+`resetAt`/`retryAfterSeconds` backoff timing, `Idempotency-Key` so a retried
+attempt can't double-generate). Configure it under **Admin → Content Engine**
+(base URL, endpoint, API key, tone, max words, factuality mode). The API key is
+encrypted at rest, decrypted only server-side, and never appears in any
+client-serializable output.
 
-`lib/content-engine/schema.ts` has an `unwrapExternalResponse` adapter point — adjust
-it if the real API wraps its JSON payload differently than the normalized
-`GeneratedContentResult` shape documented in `lib/content-engine/types.ts`.
+Until real credentials are supplied (or while the configured plan's request quota
+is exhausted — see below), leave **Mock mode** on: it produces clearly-labeled
+placeholder content so the rest of the pipeline (validation, affiliate resolution,
+SEO, publishing) can be exercised safely without spending real quota. Production
+must run with mock mode off; the app never silently falls back to mock content —
+if the real engine is misconfigured or fails, generation fails visibly instead.
+
+The API's own quality-pipeline verdict (`quality.status`/`quality.score`) is
+trusted as an extra signal: `lib/validation/content.ts` rejects generation if the
+provider itself reports anything other than `"pass"`.
+
+Real API content arrives as markdown per section — it's rendered with
+`react-markdown` (`components/content/markdown.tsx`), which never uses
+`dangerouslySetInnerHTML` and doesn't render embedded raw HTML, with an extra
+allow-list on link `href`s. The mock provider's plain-text output renders through
+the same path unchanged.
 
 ## What's implemented
 
@@ -85,24 +103,74 @@ it if the real API wraps its JSON payload differently than the normalized
   page when absent); affiliate CTA clicks fire a best-effort `affiliate_cta_click`
   event in addition to the server-side audit log entry that always happens regardless
   of analytics.
+- Affiliate network fallback (`lib/affiliate/networks/`): a real
+  `AffiliateNetworkProvider` interface, tried only when no admin mapping exists and
+  `networkFallbackEnabled` is on, every lookup audit-logged, a found link persisted
+  as a `NETWORK`-sourced mapping that an admin mapping still always overrides. The
+  registered example provider is a documented no-op (returns null) — no real
+  network contract/credentials exist to integrate against yet; this is the
+  architecture a real one plugs into, not a fabricated integration.
+- Content freshness (`lib/publishing/refresh.ts`, **Admin → Content Freshness**):
+  finds published pages older than a configurable threshold and regenerates them —
+  a failed refresh always leaves the current published version live, never taking
+  a good page down. `POST /api/refresh` is a cron-ready endpoint (shared-secret
+  header, `CONTENT_REFRESH_SECRET`) for an external scheduler (e.g. Vercel Cron)
+  to trigger on a schedule; manual "Refresh now" in the admin UI works without it.
+- Search: public (`/search`, published pages only) and admin (`/admin/search`,
+  every status, admin-only).
 - Automated tests: `tests/unit` (Vitest, pure logic — canonical URLs, claims scanner,
-  disclosure rules, publish gates, placeholder resolution, mock content schema) and
-  `tests/integration` (Vitest against the real configured database — region-isolated
-  affiliate resolution, uniqueness scoring, hreflang, draft-page visibility) and
-  `tests/e2e` (Playwright against a real production build — full admin login → generate
-  → validate → preview → publish → public page → GSC flow, a full sitemap crawl with
-  console-error checking, security/open-redirect checks, and mobile-viewport overflow
-  checks).
+  disclosure rules, publish gates, placeholder resolution, the Keyword-to-Blog
+  request/response adapter against real captured API responses and error bodies)
+  and `tests/integration` (Vitest against the real configured database —
+  region-isolated affiliate resolution incl. network-fallback priority, uniqueness
+  scoring, hreflang, draft-page visibility) and `tests/e2e` (Playwright against a
+  real production build — full admin login → generate → validate → preview →
+  publish → public page → GSC flow including a real uniqueness-rejection →
+  Regenerate → publish recovery, a full sitemap crawl with console-error checking,
+  search, security/open-redirect checks, and mobile-viewport overflow checks).
+
+## Real API integration status (honest, as tested)
+
+The Keyword-to-Blog API key provided is on a very small trial quota (observed: 1
+request/minute, 3 requests/day). Against it, this integration was verified with:
+- **One successful live `POST /v1/generate` call** — confirmed the exact response
+  shape (`requestId`/`post.{title,meta,outline,sections,faqs,conclusion,
+  coverageNotes}`/`rendered`/`debug`/`quality`) matches what's documented and what
+  the adapter parses.
+- **Three real error responses captured live** (`RATE_LIMITED` per-minute,
+  `RATE_LIMITED` daily-quota, `INTERNAL_ERROR` on a length-constraint failure) —
+  all three are now regression-tested fixtures in
+  `tests/unit/keyword-to-blog-provider.test.ts`.
+- The full documented schema (all endpoints, every error code, webhook signing) was
+  read from the API's own `/docs/*` pages to build the adapter, rather than guessed.
+
+**Not tested**: a full generate → validate → publish run against the real API
+end-to-end (the 3/day quota was exhausted by the schema-discovery calls above
+before a full pipeline run could be attempted), the async `/v1/jobs` + webhook
+path (needs a publicly reachable HTTPS endpoint this environment doesn't have),
+and `GET /v1/usage` (confirmed to 404 on this specific preview deployment, so it
+isn't wired into Test Connection). The shared dev database in this environment is
+currently set to **mock mode** so the rest of the test suite keeps working without
+spending the real quota — the real credentials are fully configured and encrypted
+in the database, ready to flip on via **Admin → Content Engine → Mock mode**
+(quota resets daily at UTC midnight per the API's own docs).
 
 ## Deliberately out of scope for this pass
 
-These are real spec areas not yet built — flagged rather than faked:
-
-- Affiliate network fallback providers (the `networkFallbackEnabled` setting exists
-  but no provider adapters are implemented; admin mappings are the only source).
-- A background job queue (batch generation runs synchronously within the request that
-  triggered it, not via a durable queue/worker).
-- Scheduled content-freshness refresh, manual content overrides, and an in-app search.
+- The async `/v1/jobs` + webhook path (`POST /v1/jobs`, `GET /v1/jobs/{jobId}`,
+  webhook signature verification) — the API supports it, and it would suit large
+  batches better given how tight the sync endpoint's rate limit is, but it needs a
+  publicly reachable HTTPS webhook endpoint this environment doesn't have, so it's
+  unbuilt rather than built-and-untestable.
+- A durable, crash-recoverable job queue: `GenerationJob` rows are real, persisted,
+  and queryable after a restart, but a job that was actually in-flight when the
+  process died isn't automatically resumed — there's no background worker,
+  everything runs within the request that triggered it.
+- Manual content field overrides (spec section 110) and a dedicated admin
+  request/response debug viewer (spec section 68) beyond what's already on each
+  page's detail view (request ID, API version, validation report).
+- A real affiliate network integration and a production deployment (see the final
+  report for this session for why, and what running one would require).
 
 ## Scripts
 

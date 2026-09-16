@@ -39,6 +39,9 @@ export interface ContentEngineConfigView {
   webhookUrl: string | null;
   mockMode: boolean;
   enabled: boolean;
+  defaultTone: string;
+  defaultMaxWords: number;
+  factualityMode: string;
   updatedAt: Date;
 }
 
@@ -67,6 +70,9 @@ export async function getContentEngineConfigView(): Promise<ContentEngineConfigV
     webhookUrl: row.webhookUrl,
     mockMode: row.mockMode,
     enabled: row.enabled,
+    defaultTone: row.defaultTone,
+    defaultMaxWords: row.defaultMaxWords,
+    factualityMode: row.factualityMode,
     updatedAt: row.updatedAt,
   };
 }
@@ -87,6 +93,9 @@ export async function getContentEngineRuntimeConfig(): Promise<ContentEngineRunt
     customHeaders: (row.customHeaders as Record<string, string> | null) ?? null,
     mockMode: row.mockMode,
     enabled: row.enabled,
+    defaultTone: (row.defaultTone as "professional" | "friendly" | "bold") ?? "professional",
+    defaultMaxWords: row.defaultMaxWords,
+    factualityMode: (row.factualityMode as "standard" | "verified") ?? "standard",
   };
 }
 
@@ -103,6 +112,9 @@ export interface UpdateContentEngineConfigInput {
   webhookUrl?: string | null;
   mockMode?: boolean;
   enabled?: boolean;
+  defaultTone?: string;
+  defaultMaxWords?: number;
+  factualityMode?: string;
 }
 
 export async function updateContentEngineConfig(input: UpdateContentEngineConfigInput): Promise<void> {
@@ -124,6 +136,9 @@ export async function updateContentEngineConfig(input: UpdateContentEngineConfig
       ...(input.webhookUrl !== undefined ? { webhookUrl: input.webhookUrl } : {}),
       ...(input.mockMode !== undefined ? { mockMode: input.mockMode } : {}),
       ...(input.enabled !== undefined ? { enabled: input.enabled } : {}),
+      ...(input.defaultTone !== undefined ? { defaultTone: input.defaultTone } : {}),
+      ...(input.defaultMaxWords !== undefined ? { defaultMaxWords: input.defaultMaxWords } : {}),
+      ...(input.factualityMode !== undefined ? { factualityMode: input.factualityMode } : {}),
     },
   });
 }
