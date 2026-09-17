@@ -26,10 +26,12 @@ async function main() {
   }
 
   const page = await prisma.generatedPage.findUniqueOrThrow({ where: { id: outcome.pageId } });
+  const content = page.content as any;
   console.log("Page status after generation:", page.status, "uniquenessScore:", page.uniquenessScore);
+  console.log("Image attached:", content.image ? { photographer: content.image.photographer, alt: content.image.alt } : null);
 
   if (!outcome.ok) {
-    console.log("Generation did not pass structural validation — will NOT publish. Issues:", outcome.issues);
+    console.log("Generation did not pass structural validation — will NOT publish. Issues:", JSON.stringify(outcome.issues));
     return;
   }
 
@@ -38,7 +40,7 @@ async function main() {
 
   if (publish.ok) {
     const published = await prisma.generatedPage.findUniqueOrThrow({ where: { id: outcome.pageId } });
-    console.log("PUBLISHED:", { title: published.title, canonicalPath: published.canonicalPath, status: published.status });
+    console.log("PUBLISHED:", JSON.stringify({ title: published.title, canonicalPath: published.canonicalPath, status: published.status }));
   } else {
     console.log("Publish gates failed — page remains unpublished (correctly not live).");
   }

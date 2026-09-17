@@ -4,6 +4,7 @@ import { getHreflangAlternates } from "@/lib/seo/hreflang";
 import { AffiliateCtaLink } from "@/components/affiliate/affiliate-cta-link";
 import { Markdown } from "@/components/content/markdown";
 import { ArticleFaq } from "@/components/content/article-faq";
+import { ArticleImage } from "@/components/content/article-image";
 import { Reveal } from "@/components/motion/reveal";
 import { PAGE_TYPE_LABEL } from "@/lib/content/page-type-label";
 import type { StoredPageContent } from "@/lib/publishing/pipeline";
@@ -88,6 +89,8 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
           </Reveal>
         </div>
       </header>
+
+      {content.image ? <ArticleImage image={content.image} /> : null}
 
       <div className="mx-auto max-w-3xl px-4 py-10">
         {content.picks && content.picks.length > 0 ? (

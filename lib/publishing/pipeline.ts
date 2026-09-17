@@ -14,6 +14,7 @@ import { slugify } from "@/lib/seo/slug";
 import { computeContentHash, getNextVersion } from "@/lib/publishing/version";
 import { evaluatePublishGates, allGatesPassed, type PublishGateResult } from "@/lib/validation/publish-gates";
 import { queueGscSubmission, processGscSubmission } from "@/lib/gsc/submit";
+import { searchLandscapeImage, buildImageSearchQuery } from "@/lib/pexels/client";
 import type { GenerationRequest, GeneratedContentResult } from "@/lib/content-engine/types";
 import type { PageType } from "@/app/generated/prisma/client";
 import type { Prisma } from "@/app/generated/prisma/client";
@@ -255,11 +256,18 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
   });
   const internalLinks = internalLinkCandidates.map((p) => ({ title: p.title, url: buildCanonicalUrl(p.canonicalPath) }));
 
+  // Best-effort illustrative photo — never blocks generation or publishing.
+  // searchLandscapeImage returns null (never a fabricated URL) on missing
+  // config, no results, or any failure.
+  const imageQuery = buildImageSearchQuery({ keyword: keyword?.text, brand: brand?.name, category: keyword?.category });
+  const image = await searchLandscapeImage(imageQuery);
+
   const content: StoredPageContent = {
     generated: resolvedContent,
     picks: picks.length > 0 ? picks : undefined,
     brand: brand ? { id: brand.id, name: brand.name, affiliateUrl: brandAffiliate?.url ?? null } : undefined,
     disclosures,
+    image: image ?? undefined,
   };
 
   const validationReport: ValidationReport = {

@@ -1,6 +1,7 @@
 import type { GeneratedContentResult } from "@/lib/content-engine/types";
 import type { DisclosureBlock } from "@/lib/validation/disclosure";
 import type { ValidationIssue } from "@/lib/validation/content";
+import type { StoredArticleImage } from "@/lib/pexels/types";
 
 export interface StoredPick {
   brandId: string;
@@ -17,6 +18,10 @@ export interface StoredPageContent {
   picks?: StoredPick[];
   brand?: { id: string; name: string; affiliateUrl: string | null };
   disclosures: DisclosureBlock[];
+  /** Best-effort Pexels illustrative photo — absent when no image was found,
+   * Pexels wasn't configured, or the search failed. Never a hard requirement
+   * for publishing. */
+  image?: StoredArticleImage;
 }
 
 export interface StoredSeo {
