@@ -41,6 +41,14 @@ test.describe("security: auth gating and open-redirect protection", () => {
     expect([401, 503]).toContain(wrongSecret.status());
   });
 
+  test("the cron-only scheduled-generation endpoint rejects requests without a valid CRON_SECRET bearer token", async ({ request }) => {
+    const noAuth = await request.get("/api/schedule/generate");
+    expect([401, 503]).toContain(noAuth.status()); // 503 if CRON_SECRET isn't configured at all
+
+    const wrongAuth = await request.get("/api/schedule/generate", { headers: { authorization: "Bearer wrong" } });
+    expect([401, 503]).toContain(wrongAuth.status());
+  });
+
   test("click redirect never forwards to a placeholder/example destination, and a destination query param is structurally ignored", async ({ page: browserPage, request }) => {
     // Discover a real brandId and pageId the same way an admin would — via the
     // admin UI's own detail-view links — rather than importing Prisma directly
