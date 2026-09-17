@@ -4,20 +4,20 @@ import { TiltCard } from "@/components/motion/tilt-card";
 
 const CATEGORIES = [
   {
-    title: "Mattress Reviews",
-    description: "In-depth, independently written reviews of individual mattress models and brands.",
+    title: "Tech Reviews",
+    description: "In-depth, independently written reviews of laptops, phones, and everyday tech.",
     href: "/us",
     gradient: "from-glow-a/30 to-transparent",
   },
   {
-    title: "Compare Mattresses",
-    description: "See how brands stack up on firmness, cooling, trial length, and warranty terms.",
-    href: "#compare",
+    title: "Electronics Reviews",
+    description: "Audio, smart home, and gadget reviews tested against real competitors, not spec sheets.",
+    href: "/us",
     gradient: "from-glow-b/30 to-transparent",
   },
   {
-    title: "Top Picks & Deals",
-    description: "Curated picks with verified affiliate offers — never a fabricated discount.",
+    title: "Fashion Trends",
+    description: "What's actually worth buying this season — curated picks with verified offers.",
     href: "/us/deals",
     gradient: "from-glow-c/30 to-transparent",
   },

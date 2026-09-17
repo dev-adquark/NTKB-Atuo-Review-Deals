@@ -4,18 +4,18 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
 const LAYERS = [
-  { key: "comfort", label: "Comfort Layer", blurb: "The top layer that cradles pressure points on first contact.", color: "from-glow-a/70 to-glow-a/30" },
-  { key: "cooling", label: "Cooling Layer", blurb: "Helps pull heat away so the surface sleeps cooler through the night.", color: "from-glow-b/70 to-glow-b/30" },
-  { key: "support", label: "Support Core", blurb: "Keeps the spine aligned and stops the middle from sagging over time.", color: "from-glow-c/70 to-glow-c/30" },
-  { key: "base", label: "Base Foundation", blurb: "A dense bottom layer that anchors every layer above it.", color: "from-primary/60 to-primary/20" },
+  { key: "performance", label: "Performance", blurb: "Real-world speed, output, or fit — not just spec-sheet numbers.", color: "from-glow-a/70 to-glow-a/30" },
+  { key: "design", label: "Design & Build", blurb: "Materials, construction quality, and how it holds up day to day.", color: "from-glow-b/70 to-glow-b/30" },
+  { key: "value", label: "Value for Money", blurb: "Weighed against real competitors at the same price point.", color: "from-glow-c/70 to-glow-c/30" },
+  { key: "verdict", label: "Verdict", blurb: "The bottom line — who it's actually worth buying for.", color: "from-primary/60 to-primary/20" },
 ] as const;
 
 /**
- * A CSS/SVG-built layered mattress cross-section (no product photography or
+ * A CSS-built layered review-breakdown visual (no product photography or
  * WebGL) — angled with a perspective transform for a pseudo-3D feel, and
- * interactive: hovering/tapping a layer reveals what it does (spec section 30).
+ * interactive: hovering/tapping a criterion reveals what it means.
  */
-export function MattressVisual() {
+export function ReviewBreakdownVisual() {
   const [activeLayer, setActiveLayer] = useState<(typeof LAYERS)[number]["key"] | null>(null);
   const reduce = useReducedMotion();
   const active = LAYERS.find((l) => l.key === activeLayer);
@@ -47,12 +47,12 @@ export function MattressVisual() {
           ))}
         </div>
 
-        {/* Floating info badges around the composition (spec sections 5, 31) */}
+        {/* Floating info badges around the composition */}
         <FloatingBadge className="-left-8 top-2 sm:-left-14" delay={0.15}>
           4.8 ★ Rated
         </FloatingBadge>
         <FloatingBadge className="-right-6 top-14 sm:-right-12" delay={0.3}>
-          Hybrid · Cooling
+          Editor&rsquo;s Pick
         </FloatingBadge>
         <FloatingBadge className="-left-6 bottom-16 sm:-left-16" delay={0.45}>
           Best Value
@@ -68,7 +68,7 @@ export function MattressVisual() {
             <span className="font-medium text-foreground">{active.label}:</span> {active.blurb}
           </>
         ) : (
-          "Hover or tap a layer to see what it does."
+          "Hover or tap a criterion to see what it means."
         )}
       </div>
     </div>

@@ -15,7 +15,7 @@ export default async function SearchPage({ searchParams }: PageProps<"/search">)
       <Reveal>
         <span className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Search</span>
         <h1 className="mt-3 font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl">
-          Find a mattress review or deal
+          Find a review or deal
         </h1>
       </Reveal>
 

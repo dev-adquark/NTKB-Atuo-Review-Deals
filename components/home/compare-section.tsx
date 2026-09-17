@@ -2,11 +2,11 @@ import { SectionHeading } from "./section-heading";
 import { Reveal } from "@/components/motion/reveal";
 
 const CRITERIA = [
-  { label: "Firmness & feel", detail: "Soft, medium, or firm — matched to sleep position and body weight." },
-  { label: "Cooling & materials", detail: "Foam density, hybrid coils, and breathable covers that affect temperature." },
-  { label: "Trial period", detail: "How long you can sleep on it before a return decision is required." },
+  { label: "Performance & specs", detail: "Real-world benchmarks and everyday use, not just numbers on a spec sheet." },
+  { label: "Build & design", detail: "Materials, construction quality, and how well it holds up over time." },
+  { label: "Battery & reliability", detail: "Real-world battery life and long-term dependability, where applicable." },
   { label: "Warranty coverage", detail: "Years of coverage and what's actually included versus excluded." },
-  { label: "Shipping & setup", detail: "Compressed delivery timelines and in-home setup realities by region." },
+  { label: "Shipping & availability", detail: "Realistic delivery timelines and regional availability." },
   { label: "Verified pricing", detail: "Only current, source-checked pricing — never an invented discount." },
 ];
 
@@ -16,7 +16,7 @@ export function CompareSection() {
       <div className="mx-auto max-w-6xl px-4">
         <SectionHeading
           eyebrow="Compare"
-          title="What actually separates one mattress from another"
+          title="What actually separates one product from another"
           description="Every review scores the same criteria, so comparisons stay consistent no matter which brands you're weighing."
         />
 

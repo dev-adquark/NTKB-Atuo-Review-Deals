@@ -16,7 +16,7 @@ const REASONS = [
   },
   {
     title: "Region-aware by design",
-    detail: "US, EU, AU, and India each get their own pricing, warranty, and affiliate context — not a single global list.",
+    detail: "US and EU each get their own pricing, warranty, and affiliate context — not a single global list.",
   },
 ];
 

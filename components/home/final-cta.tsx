@@ -7,7 +7,7 @@ export function FinalCta() {
       <Reveal className="relative overflow-hidden rounded-[2rem] border border-border-default bg-gradient-to-br from-primary via-primary to-accent px-8 py-16 text-center sm:px-16">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.18),_transparent_60%)]" />
         <h2 className="relative font-display text-3xl font-medium tracking-tight text-primary-foreground sm:text-4xl">
-          Find the mattress that actually fits how you sleep.
+          Find the product that&rsquo;s actually worth buying.
         </h2>
         <p className="relative mx-auto mt-4 max-w-xl text-primary-foreground/80">
           Browse region-specific reviews and verified deals — no fabricated claims, no fine-print surprises.

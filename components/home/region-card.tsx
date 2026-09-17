@@ -2,10 +2,8 @@ import Link from "next/link";
 import { TiltCard } from "@/components/motion/tilt-card";
 
 const REGION_STYLE: Record<string, { gradient: string; blurb: string }> = {
-  US: { gradient: "from-glow-a/40 via-transparent to-transparent", blurb: "Free-trial windows, fast returns" },
+  US: { gradient: "from-glow-a/40 via-transparent to-transparent", blurb: "Fast shipping, easy returns" },
   EU: { gradient: "from-glow-b/40 via-transparent to-transparent", blurb: "GDPR-aware, VAT-inclusive pricing" },
-  AU: { gradient: "from-glow-c/40 via-transparent to-transparent", blurb: "Local warranty, honest shipping times" },
-  IN: { gradient: "from-primary/40 via-transparent to-transparent", blurb: "EMI options, regional-language support" },
 };
 
 export function RegionCard({ code, name, href }: { code: string; name: string; href: string }) {

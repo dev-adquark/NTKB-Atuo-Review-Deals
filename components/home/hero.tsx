@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "motion/react";
-import { MattressVisual } from "./mattress-visual";
+import { ReviewBreakdownVisual } from "./review-breakdown-visual";
 
 const container = {
   hidden: {},
@@ -37,19 +37,19 @@ export function Hero() {
             variants={item}
             className="inline-flex items-center gap-2 rounded-full border border-border-default bg-surface/70 px-3.5 py-1.5 text-xs font-medium text-muted backdrop-blur-sm"
           >
-            Independent mattress reviews for US · EU · AU · IN
+            Independent tech, electronics & fashion reviews for US · EU
           </motion.span>
 
           <motion.h1
             variants={item}
             className="mt-6 font-display text-[2.75rem] leading-[1.05] font-medium tracking-tight text-foreground sm:text-6xl lg:text-[3.75rem]"
           >
-            Discover Better Sleep.
+            Reviews You Can Trust.
           </motion.h1>
 
           <motion.p variants={item} className="mx-auto mt-6 max-w-lg text-lg text-muted lg:mx-0">
-            Compare mattresses, explore trusted reviews, and find the right deal for your region — backed by clear
-            affiliate disclosure, never fabricated claims.
+            Compare the latest tech, electronics, and fashion picks, and find the right deal for your region — backed
+            by clear affiliate disclosure, never fabricated claims.
           </motion.p>
 
           <motion.div variants={item} className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
@@ -57,7 +57,7 @@ export function Hero() {
               href="#discover"
               className="group inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-[0_12px_30px_-10px_rgba(67,56,202,0.5)] transition-transform hover:-translate-y-0.5"
             >
-              Explore Mattress Reviews
+              Explore Reviews
               <span aria-hidden className="transition-transform group-hover:translate-x-0.5">
                 →
               </span>
@@ -66,7 +66,7 @@ export function Hero() {
               href="#compare"
               className="inline-flex items-center gap-2 rounded-full border border-border-strong px-6 py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-raised"
             >
-              Compare Mattresses
+              Compare Picks
             </Link>
           </motion.div>
         </motion.div>
@@ -76,7 +76,7 @@ export function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] as const }}
         >
-          <MattressVisual />
+          <ReviewBreakdownVisual />
         </motion.div>
       </div>
     </section>

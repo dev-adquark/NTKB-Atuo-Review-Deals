@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: PageProps<"/[region]/deals">)
   const region = await getRegionByPrefix(regionPrefix);
   if (!region) return {};
   const canonical = buildCanonicalUrl(`/${region.urlPrefix}/deals`);
-  const title = `Mattress Deals — ${region.name}`;
-  const description = `Verified mattress top picks and deals for shoppers in ${region.name}.`;
+  const title = `Deals — ${region.name}`;
+  const description = `Verified tech, electronics, and fashion top picks and deals for shoppers in ${region.name}.`;
   return {
     title,
     description,
@@ -52,7 +52,7 @@ export default async function RegionDealsPage({ params }: PageProps<"/[region]/d
           <Reveal>
             <span className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">{region.code} Deals</span>
             <h1 className="mt-3 font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
-              Mattress deals for {region.name}
+              Deals for {region.name}
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-muted">
               Only surfaced when a real, admin-verified affiliate offer exists — never an implied discount.

@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps<"/[region]">): Prom
   if (!region) return {};
   const canonical = buildCanonicalUrl(`/${region.urlPrefix}`);
   const title = `${region.name} — NTKB Auto Review Deals`;
-  const description = `Mattress reviews and top picks for shoppers in ${region.name}.`;
+  const description = `Tech, electronics, and fashion reviews and top picks for shoppers in ${region.name}.`;
   return {
     title,
     description,
@@ -59,7 +59,7 @@ export default async function RegionHubPage({ params }: PageProps<"/[region]">) 
           <Reveal>
             <span className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">{region.code} Region</span>
             <h1 className="mt-3 font-display text-4xl font-medium tracking-tight text-foreground sm:text-5xl">
-              Mattress reviews for {region.name}
+              Reviews for {region.name}
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-muted">
               Pricing, warranty terms, and shipping guidance mapped specifically to {region.name} shoppers.

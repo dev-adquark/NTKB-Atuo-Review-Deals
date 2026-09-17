@@ -22,7 +22,7 @@ export function ReviewCard({ page, ctaLabel = "Read review" }: { page: ReviewCar
           <span className="text-xs font-medium tracking-wide text-muted">{page.regionCode}</span>
         </div>
 
-        <MiniMattressGlyph />
+        <MiniReviewGlyph />
 
         <h3 className="mt-4 font-display text-lg font-medium leading-snug text-foreground">{page.title}</h3>
         <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted">{page.description}</p>
@@ -38,7 +38,7 @@ export function ReviewCard({ page, ctaLabel = "Read review" }: { page: ReviewCar
   );
 }
 
-function MiniMattressGlyph() {
+function MiniReviewGlyph() {
   return (
     <div className="mt-4 flex gap-1" aria-hidden>
       <span className="h-2 flex-1 rounded-full bg-gradient-to-r from-glow-a/70 to-glow-a/20" />

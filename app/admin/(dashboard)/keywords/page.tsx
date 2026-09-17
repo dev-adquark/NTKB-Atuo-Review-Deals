@@ -64,7 +64,7 @@ export default async function AdminKeywordsPage() {
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <p className="text-xs text-neutral-500">Keyword</p>
-            <input name="text" required placeholder="best mattresses" className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400" />
+            <input name="text" required placeholder="best wireless earbuds" className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400" />
           </div>
           <div>
             <p className="text-xs text-neutral-500">Region</p>

@@ -6,9 +6,9 @@ test.describe("mobile-first responsiveness", () => {
   const pagesToCheck = [
     "/",
     "/us",
-    "/us/best-mattresses",
-    "/us/reviews/nestease",
-    "/us/deals/best-mattress-deals",
+    "/us/best-wireless-earbuds",
+    "/us/reviews/pulsegear",
+    "/us/deals/best-laptop-deals",
     "/privacy",
     "/affiliate-disclosure",
   ];

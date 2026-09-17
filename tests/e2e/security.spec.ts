@@ -40,7 +40,7 @@ test.describe("security: auth gating and open-redirect protection", () => {
 
   test("click redirect only ever forwards to a real, currently-active affiliate mapping URL", async ({ page, request }) => {
     // Find a real /click/ link from a live public page rather than guessing an ID.
-    await page.goto("/us/best-mattresses");
+    await page.goto("/us/best-wireless-earbuds");
     const clickHref = await page.locator('a[href^="/click/"]').first().getAttribute("href");
     expect(clickHref).toBeTruthy();
 

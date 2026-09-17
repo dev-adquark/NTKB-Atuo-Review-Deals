@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 
 const FAQS = [
   {
-    q: "How does NTKB choose which mattresses to review?",
+    q: "How does NTKB choose which products to review?",
     a: "Reviews are generated from keyword and brand configurations set by our editorial team, then validated for required content, uniqueness, and factual claims before anything is published.",
   },
   {
@@ -18,7 +18,7 @@ const FAQS = [
   },
   {
     q: "Why do recommendations differ by region?",
-    a: "Availability, pricing, warranty terms, and shipping realities differ meaningfully between the US, EU, AU, and India, so each region gets its own affiliate mappings and region-specific guidance rather than a one-size-fits-all list.",
+    a: "Availability, pricing, warranty terms, and shipping realities differ meaningfully between the US and Europe, so each region gets its own affiliate mappings and region-specific guidance rather than a one-size-fits-all list.",
   },
 ];
 

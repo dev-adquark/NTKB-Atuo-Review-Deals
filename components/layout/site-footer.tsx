@@ -4,8 +4,9 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
   {
     heading: "Explore",
     links: [
-      { label: "Mattress Reviews", href: "/us" },
-      { label: "Top Picks & Deals", href: "/us/deals" },
+      { label: "Tech Reviews", href: "/us" },
+      { label: "Electronics Reviews", href: "/us" },
+      { label: "Fashion Trends", href: "/us" },
       { label: "Search", href: "/search" },
     ],
   },
@@ -13,8 +14,7 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     heading: "Guides",
     links: [
       { label: "How We Review", href: "/us" },
-      { label: "Firmness & Comfort", href: "/us" },
-      { label: "Cooling & Materials", href: "/us" },
+      { label: "Top Picks & Deals", href: "/us/deals" },
     ],
   },
   {
@@ -22,8 +22,6 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     links: [
       { label: "United States", href: "/us" },
       { label: "Europe", href: "/eu" },
-      { label: "Australia", href: "/au" },
-      { label: "India", href: "/in" },
     ],
   },
   {

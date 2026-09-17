@@ -23,11 +23,11 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
   title: {
-    default: "NTKB Auto Review Deals — Discover Better Sleep",
+    default: "NTKB Auto Review Deals — Reviews You Can Trust",
     template: "%s — NTKB Auto Review Deals",
   },
   description:
-    "Compare mattresses, explore trusted reviews, and find the right sleep deal for your region — US, Europe, Australia and India.",
+    "Compare tech, electronics, and fashion picks, explore trusted reviews, and find the right deal for your region — US and Europe.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

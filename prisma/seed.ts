@@ -7,11 +7,14 @@ const connectionString = process.env.DATABASE_URL;
 if (!connectionString) throw new Error("DATABASE_URL is not set");
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
+// Site scope is strictly US + Europe. AU/IN rows are kept (not deleted, to avoid
+// breaking historical foreign-key references) but deactivated so they never
+// appear in nav/footer/region discovery or resolve as a live route.
 const REGIONS = [
-  { code: "US" as const, name: "United States", language: "en-US", urlPrefix: "us", currency: "USD" },
-  { code: "EU" as const, name: "Europe", language: "en-GB", urlPrefix: "eu", currency: "EUR" },
-  { code: "AU" as const, name: "Australia", language: "en-AU", urlPrefix: "au", currency: "AUD" },
-  { code: "IN" as const, name: "India", language: "en-IN", urlPrefix: "in", currency: "INR" },
+  { code: "US" as const, name: "United States", language: "en-US", urlPrefix: "us", currency: "USD", active: true },
+  { code: "EU" as const, name: "Europe", language: "en-GB", urlPrefix: "eu", currency: "EUR", active: true },
+  { code: "AU" as const, name: "Australia", language: "en-AU", urlPrefix: "au", currency: "AUD", active: false },
+  { code: "IN" as const, name: "India", language: "en-IN", urlPrefix: "in", currency: "INR", active: false },
 ];
 
 async function main() {
@@ -21,10 +24,11 @@ async function main() {
     const row = await prisma.region.upsert({
       where: { code: region.code },
       create: region,
-      update: { name: region.name, language: region.language, urlPrefix: region.urlPrefix, currency: region.currency },
+      update: { name: region.name, language: region.language, urlPrefix: region.urlPrefix, currency: region.currency, active: region.active },
     });
     regions.push(row);
   }
+  const activeRegions = regions.filter((r) => r.active);
 
   console.log("Seeding admin user…");
   const email = process.env.ADMIN_BOOTSTRAP_EMAIL;
@@ -42,18 +46,26 @@ async function main() {
 
   console.log("Seeding sample brands…");
   const brandA = await prisma.brand.upsert({
-    where: { slug: "nestease" },
-    create: { name: "NestEase", slug: "nestease", description: "Sample hybrid mattress brand for demo/testing." },
+    where: { slug: "pulsegear" },
+    create: { name: "PulseGear", slug: "pulsegear", description: "Sample tech/electronics brand for demo/testing." },
     update: {},
   });
   const brandB = await prisma.brand.upsert({
-    where: { slug: "slumbercraft" },
-    create: { name: "SlumberCraft", slug: "slumbercraft", description: "Sample memory-foam mattress brand for demo/testing." },
+    where: { slug: "stridewear" },
+    create: { name: "StrideWear", slug: "stridewear", description: "Sample fashion brand for demo/testing." },
     update: {},
   });
 
+  // Strict content scope: Tech Reviews, Electronics Reviews, Fashion Trends only,
+  // across the two active regions (US, EU).
+  const KEYWORDS = [
+    { slug: "best-wireless-earbuds", text: "best wireless earbuds", pageType: "KEYWORD_REVIEW" as const, category: "Electronics", brandIds: (a: string) => [a] },
+    { slug: "best-laptop-deals", text: "best laptop deals", pageType: "TOP_PICKS" as const, category: "Tech", brandIds: (a: string) => [a] },
+    { slug: "best-running-shoes", text: "best running shoes", pageType: "KEYWORD_REVIEW" as const, category: "Fashion", brandIds: (_a: string, b: string) => [b] },
+  ];
+
   console.log("Seeding rankings, affiliate mappings, and keywords per region…");
-  for (const region of regions) {
+  for (const region of activeRegions) {
     await prisma.brandRanking.upsert({
       where: { brandId_regionId: { brandId: brandA.id, regionId: region.id } },
       create: { brandId: brandA.id, regionId: region.id, rank: 1 },
@@ -67,57 +79,46 @@ async function main() {
 
     await prisma.affiliateMapping.upsert({
       where: { brandId_regionId: { brandId: brandA.id, regionId: region.id } },
-      create: { brandId: brandA.id, regionId: region.id, url: `https://affiliate.example/nestease?region=${region.code}`, source: "ADMIN" },
+      create: { brandId: brandA.id, regionId: region.id, url: `https://affiliate.example/pulsegear?region=${region.code}`, source: "ADMIN" },
       update: {},
     });
     await prisma.affiliateMapping.upsert({
       where: { brandId_regionId: { brandId: brandB.id, regionId: region.id } },
-      create: { brandId: brandB.id, regionId: region.id, url: `https://affiliate.example/slumbercraft?region=${region.code}`, source: "ADMIN" },
+      create: { brandId: brandB.id, regionId: region.id, url: `https://affiliate.example/stridewear?region=${region.code}`, source: "ADMIN" },
       update: {},
     });
 
-    await prisma.keyword.upsert({
-      where: { regionId_slug: { regionId: region.id, slug: "best-mattresses" } },
-      create: {
-        text: "best mattresses",
-        slug: "best-mattresses",
-        regionId: region.id,
-        pageType: "KEYWORD_REVIEW",
-        category: "Mattresses",
-        priority: 10,
-        targetBrandIds: [brandA.id, brandB.id],
-      },
-      update: { targetBrandIds: [brandA.id, brandB.id] },
-    });
-
-    await prisma.keyword.upsert({
-      where: { regionId_slug: { regionId: region.id, slug: "best-mattress-deals" } },
-      create: {
-        text: "best mattress deals",
-        slug: "best-mattress-deals",
-        regionId: region.id,
-        pageType: "TOP_PICKS",
-        category: "Mattresses",
-        priority: 5,
-        targetBrandIds: [brandA.id, brandB.id],
-      },
-      update: { targetBrandIds: [brandA.id, brandB.id] },
-    });
+    for (const [i, kw] of KEYWORDS.entries()) {
+      const targetBrandIds = kw.brandIds(brandA.id, brandB.id);
+      await prisma.keyword.upsert({
+        where: { regionId_slug: { regionId: region.id, slug: kw.slug } },
+        create: {
+          text: kw.text,
+          slug: kw.slug,
+          regionId: region.id,
+          pageType: kw.pageType,
+          category: kw.category,
+          priority: 10 - i,
+          targetBrandIds,
+        },
+        update: { targetBrandIds },
+      });
+    }
   }
 
-  // A distinct topic (not "mattresses") so the E2E generation test always starts
-  // with a fresh, low-overlap uniqueness pool regardless of how many times the
-  // mattress keywords above have already been generated/published.
+  // A distinct topic so the E2E generation test always starts with a fresh,
+  // low-overlap uniqueness pool regardless of how many times the keywords above
+  // have already been generated/published.
   console.log("Seeding E2E test keyword...");
-  const usRegion = regions.find((r) => r.code === "US")!;
+  const usRegion = activeRegions.find((r) => r.code === "US")!;
   await prisma.keyword.upsert({
-    where: { regionId_slug: { regionId: usRegion.id, slug: "best-mattress-protectors" } },
+    where: { regionId_slug: { regionId: usRegion.id, slug: "best-budget-smartwatches" } },
     create: {
-      text: "best mattress protectors",
-      slug: "best-mattress-protectors",
+      text: "best budget smartwatches",
+      slug: "best-budget-smartwatches",
       regionId: usRegion.id,
       pageType: "KEYWORD_REVIEW",
-      category: "Bedding Accessories",
+      category: "Electronics",
       priority: 1,
     },
     update: {},

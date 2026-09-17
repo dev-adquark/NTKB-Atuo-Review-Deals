@@ -85,9 +85,9 @@ test.describe("main flow: admin login → generate → validate → preview → 
     await page.selectOption('select[name="regionId"]', { label: "US" });
     await page.selectOption('select[name="pageType"]', "KEYWORD_REVIEW");
     // A dedicated, low-overlap keyword (see prisma/seed.ts) so uniqueness scoring
-    // stays reliable no matter how many times the mattress pages above
+    // stays reliable no matter how many times the review pages above
     // have already been generated in this database.
-    await page.selectOption('select[name="keywordId"]', { label: "best mattress protectors" });
+    await page.selectOption('select[name="keywordId"]', { label: "best budget smartwatches" });
     await page.click('form >> button:has-text("Generate")');
     await page.waitForURL(/\/admin\/pages\/[a-z0-9]+$/, { timeout: 20000 });
     generatedPageUrl = page.url();
@@ -150,7 +150,7 @@ test.describe("main flow: admin login → generate → validate → preview → 
     const response = await request.get(publicPagePath);
     expect(response.status()).toBe(200);
     const body = await response.text();
-    expect(body).toContain("Best Mattress Protectors");
+    expect(body).toContain("Best Budget Smartwatches");
     // This test keyword has no target brands (see prisma/seed.ts), so it isn't
     // monetized — correctly, no disclosure renders for it. Disclosure rendering
     // itself is covered separately by the published seeded brand/top-picks pages.

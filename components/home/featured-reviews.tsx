@@ -8,7 +8,7 @@ export function FeaturedReviews({ pages }: { pages: ReviewCardData[] }) {
     <section id="reviews" className="mx-auto max-w-6xl px-4 py-20">
       <SectionHeading
         eyebrow="Featured"
-        title="Recently published mattress reviews"
+        title="Recently published reviews"
         description="Every review runs through the same validation pipeline — required sections, factual claim checks, and a uniqueness gate — before it ever goes live."
       />
 

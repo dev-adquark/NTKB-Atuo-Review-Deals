@@ -17,12 +17,12 @@ import { PAGE_TYPE_LABEL } from "@/lib/content/page-type-label";
 
 const SITE_NAME = "NTKB Auto Review Deals";
 const SITE_DESCRIPTION =
-  "Independent, region-aware mattress reviews and top picks — with clear affiliate disclosure on every monetized page.";
+  "Independent, region-aware tech, electronics, and fashion reviews and top picks — with clear affiliate disclosure on every monetized page.";
 
 export async function generateMetadata(): Promise<Metadata> {
   const canonical = buildCanonicalUrl("/");
   return {
-    title: SITE_NAME,
+    title: { absolute: SITE_NAME },
     description: SITE_DESCRIPTION,
     alternates: { canonical },
     openGraph: { title: SITE_NAME, description: SITE_DESCRIPTION, url: canonical, type: "website" },
