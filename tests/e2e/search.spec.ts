@@ -2,9 +2,9 @@ import { test, expect } from "@playwright/test";
 
 test.describe("search", () => {
   test("public search finds a published page and never exposes drafts", async ({ page }) => {
-    await page.goto("/search?q=password");
+    await page.goto("/search?q=mattress");
     await expect(page.getByText(/result.* for/)).toBeVisible();
-    const link = page.getByRole("link", { name: /password managers/i }).first();
+    const link = page.getByRole("link", { name: /mattresses/i }).first();
     await expect(link).toBeVisible();
   });
 

@@ -25,20 +25,16 @@ export async function getHreflangAlternates(params: {
   }
 
   if (keywordText) {
-    const siblingKeywords = await prisma.keyword.findMany({
-      where: { text: { equals: keywordText, mode: "insensitive" }, pageType },
-      select: { id: true },
-    });
-    const keywordIds = siblingKeywords.map((k) => k.id);
-    if (keywordIds.length === 0) return {};
-
+    // A single query with a nested relation filter instead of a keyword lookup
+    // followed by a separate page lookup — same result, one round trip instead
+    // of two (each round trip to the DB adds real latency to every page view).
     const pages = await prisma.generatedPage.findMany({
       where: {
         pageType,
-        keywordId: { in: keywordIds },
         isCurrent: true,
         status: "PUBLISHED",
         id: { not: selfPageId },
+        keyword: { text: { equals: keywordText, mode: "insensitive" } },
       },
       include: { region: true },
     });

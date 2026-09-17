@@ -1,26 +1,122 @@
 @import "tailwindcss";
 
+/*
+  Semantic design tokens. Light values live on :root; dark overrides live under
+  .dark (toggled by next-themes on <html>). Every PUBLIC-facing component should
+  use these semantic classes (bg-surface, text-foreground, text-muted,
+  border-default, etc.) rather than raw Tailwind palette classes like
+  text-neutral-900 — raw palette classes never adapt to the dark class and are
+  exactly what made dark mode unreadable before this file existed. Admin screens
+  intentionally keep their existing light-only neutral-* classes: they carry no
+  dark: variants, so they render identically regardless of the html class.
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf9f7;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --foreground: #14171f;
+  --muted-foreground: #5b6270;
+  --border-color: #e6e3dd;
+  --border-strong: #d6d2c9;
+
+  --primary: #4338ca;
+  --primary-foreground: #ffffff;
+  --accent: #0d9488;
+  --accent-foreground: #ffffff;
+
+  --glow-a: #a5b4fc;
+  --glow-b: #67e8f9;
+  --glow-c: #f0abfc;
+
+  --success: #15803d;
+  --warning: #b45309;
+}
+
+.dark {
+  --background: #0a0d16;
+  --surface: #10141f;
+  --surface-raised: #161b29;
+  --foreground: #f3f5fa;
+  --muted-foreground: #9aa3b5;
+  --border-color: #232a3b;
+  --border-strong: #303852;
+
+  --primary: #818cf8;
+  --primary-foreground: #0a0d16;
+  --accent: #2dd4bf;
+  --accent-foreground: #0a0d16;
+
+  --glow-a: #4338ca;
+  --glow-b: #0e7490;
+  --glow-c: #86198f;
+
+  --success: #4ade80;
+  --warning: #fbbf24;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted-foreground);
+  --color-border-default: var(--border-color);
+  --color-border-strong: var(--border-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-glow-a: var(--glow-a);
+  --color-glow-b: var(--glow-b);
+  --color-glow-c: var(--glow-c);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-fraunces);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+* {
+  border-color: var(--border-color);
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Smooth, controlled theme transition (spec section 22) — background/text/border
+   only, never layout-affecting properties, so it can't itself cause a reflow. */
+body,
+.theme-transition {
+  transition:
+    background-color 220ms ease,
+    color 220ms ease,
+    border-color 220ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Markdown body copy used for generated review content (components/content/markdown.tsx). */
+.prose-content :where(strong) {
+  font-weight: 600;
+  color: var(--foreground);
 }

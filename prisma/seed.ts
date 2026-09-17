@@ -42,13 +42,13 @@ async function main() {
 
   console.log("Seeding sample brands…");
   const brandA = await prisma.brand.upsert({
-    where: { slug: "exampleguard" },
-    create: { name: "ExampleGuard", slug: "exampleguard", description: "Sample password manager brand for demo/testing." },
+    where: { slug: "nestease" },
+    create: { name: "NestEase", slug: "nestease", description: "Sample hybrid mattress brand for demo/testing." },
     update: {},
   });
   const brandB = await prisma.brand.upsert({
-    where: { slug: "securevault" },
-    create: { name: "SecureVault", slug: "securevault", description: "Sample password manager brand for demo/testing." },
+    where: { slug: "slumbercraft" },
+    create: { name: "SlumberCraft", slug: "slumbercraft", description: "Sample memory-foam mattress brand for demo/testing." },
     update: {},
   });
 
@@ -67,23 +67,23 @@ async function main() {
 
     await prisma.affiliateMapping.upsert({
       where: { brandId_regionId: { brandId: brandA.id, regionId: region.id } },
-      create: { brandId: brandA.id, regionId: region.id, url: `https://affiliate.example/exampleguard?region=${region.code}`, source: "ADMIN" },
+      create: { brandId: brandA.id, regionId: region.id, url: `https://affiliate.example/nestease?region=${region.code}`, source: "ADMIN" },
       update: {},
     });
     await prisma.affiliateMapping.upsert({
       where: { brandId_regionId: { brandId: brandB.id, regionId: region.id } },
-      create: { brandId: brandB.id, regionId: region.id, url: `https://affiliate.example/securevault?region=${region.code}`, source: "ADMIN" },
+      create: { brandId: brandB.id, regionId: region.id, url: `https://affiliate.example/slumbercraft?region=${region.code}`, source: "ADMIN" },
       update: {},
     });
 
     await prisma.keyword.upsert({
-      where: { regionId_slug: { regionId: region.id, slug: "best-password-managers" } },
+      where: { regionId_slug: { regionId: region.id, slug: "best-mattresses" } },
       create: {
-        text: "best password managers",
-        slug: "best-password-managers",
+        text: "best mattresses",
+        slug: "best-mattresses",
         regionId: region.id,
         pageType: "KEYWORD_REVIEW",
-        category: "Software",
+        category: "Mattresses",
         priority: 10,
         targetBrandIds: [brandA.id, brandB.id],
       },
@@ -91,13 +91,13 @@ async function main() {
     });
 
     await prisma.keyword.upsert({
-      where: { regionId_slug: { regionId: region.id, slug: "best-password-manager-deals" } },
+      where: { regionId_slug: { regionId: region.id, slug: "best-mattress-deals" } },
       create: {
-        text: "best password manager deals",
-        slug: "best-password-manager-deals",
+        text: "best mattress deals",
+        slug: "best-mattress-deals",
         regionId: region.id,
         pageType: "TOP_PICKS",
-        category: "Software",
+        category: "Mattresses",
         priority: 5,
         targetBrandIds: [brandA.id, brandB.id],
       },
@@ -105,19 +105,19 @@ async function main() {
     });
   }
 
-  // A distinct topic (not "password managers") so the E2E generation test always
-  // starts with a fresh, low-overlap uniqueness pool regardless of how many times
-  // the password-manager keywords above have already been generated/published.
+  // A distinct topic (not "mattresses") so the E2E generation test always starts
+  // with a fresh, low-overlap uniqueness pool regardless of how many times the
+  // mattress keywords above have already been generated/published.
   console.log("Seeding E2E test keyword...");
   const usRegion = regions.find((r) => r.code === "US")!;
   await prisma.keyword.upsert({
-    where: { regionId_slug: { regionId: usRegion.id, slug: "best-noise-cancelling-headphones" } },
+    where: { regionId_slug: { regionId: usRegion.id, slug: "best-mattress-protectors" } },
     create: {
-      text: "best noise cancelling headphones",
-      slug: "best-noise-cancelling-headphones",
+      text: "best mattress protectors",
+      slug: "best-mattress-protectors",
       regionId: usRegion.id,
       pageType: "KEYWORD_REVIEW",
-      category: "Electronics",
+      category: "Bedding Accessories",
       priority: 1,
     },
     update: {},

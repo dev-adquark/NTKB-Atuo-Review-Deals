@@ -15,13 +15,15 @@ function createClient() {
 }
 
 function getClient() {
-  const client = globalThis.__prisma ?? createClient();
-
-  if (process.env.NODE_ENV !== "production") {
-    globalThis.__prisma = client;
+  // Reuse one client/connection pool for the life of this process in every
+  // environment. Without this, each call would open a brand new pg pool (fresh
+  // TCP+TLS handshake to Neon) per query — the previous env-gated version only
+  // cached in development, so every production request paid that cost on every
+  // single query it made.
+  if (!globalThis.__prisma) {
+    globalThis.__prisma = createClient();
   }
-
-  return client;
+  return globalThis.__prisma;
 }
 
 /**

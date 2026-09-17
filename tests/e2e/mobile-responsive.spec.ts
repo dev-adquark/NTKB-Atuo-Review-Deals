@@ -6,9 +6,9 @@ test.describe("mobile-first responsiveness", () => {
   const pagesToCheck = [
     "/",
     "/us",
-    "/us/best-password-managers",
-    "/us/reviews/exampleguard",
-    "/us/deals/best-password-manager-deals",
+    "/us/best-mattresses",
+    "/us/reviews/nestease",
+    "/us/deals/best-mattress-deals",
     "/privacy",
     "/affiliate-disclosure",
   ];

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AnalyticsScripts } from "@/components/analytics/analytics-scripts";
 import "./globals.css";
 
@@ -13,24 +14,34 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["opsz", "SOFT"],
+});
+
 export const metadata: Metadata = {
   metadataBase: process.env.NEXT_PUBLIC_SITE_URL ? new URL(process.env.NEXT_PUBLIC_SITE_URL) : undefined,
   title: {
-    default: "NTKB Auto Review Deals",
+    default: "NTKB Auto Review Deals — Discover Better Sleep",
     template: "%s — NTKB Auto Review Deals",
   },
-  description: "Independent, region-aware reviews and top picks with clear affiliate disclosure.",
+  description:
+    "Compare mattresses, explore trusted reviews, and find the right sleep deal for your region — US, Europe, Australia and India.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        {children}
-        <AnalyticsScripts />
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        <ThemeProvider>
+          {children}
+          <AnalyticsScripts />
+        </ThemeProvider>
       </body>
     </html>
   );
