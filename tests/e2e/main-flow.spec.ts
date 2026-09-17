@@ -87,7 +87,7 @@ test.describe("main flow: admin login → generate → validate → preview → 
     // A dedicated, low-overlap keyword (see prisma/seed.ts) so uniqueness scoring
     // stays reliable no matter how many times the review pages above
     // have already been generated in this database.
-    await page.selectOption('select[name="keywordId"]', { label: "best budget smartwatches" });
+    await page.selectOption('select[name="keywordId"]', { label: "best fitness bands" });
     await page.click('form >> button:has-text("Generate")');
     await page.waitForURL(/\/admin\/pages\/[a-z0-9]+$/, { timeout: 20000 });
     generatedPageUrl = page.url();
@@ -99,7 +99,10 @@ test.describe("main flow: admin login → generate → validate → preview → 
   test("preview shows validation report, SEO, and disclosure before publish", async () => {
     await page.goto(generatedPageUrl);
     await expect(page.getByText("Validation report")).toBeVisible();
-    await expect(page.getByText("SEO")).toBeVisible();
+    // A plain text match on "SEO" is ambiguous once this keyword has a prior
+    // version to diff against (the diff view's "SEO title"/"SEO description"
+    // rows also contain the substring) — target the section heading itself.
+    await expect(page.getByRole("heading", { name: "SEO" })).toBeVisible();
     await expect(page.getByText(/MOCK MODE/)).toBeVisible();
   });
 
@@ -150,7 +153,7 @@ test.describe("main flow: admin login → generate → validate → preview → 
     const response = await request.get(publicPagePath);
     expect(response.status()).toBe(200);
     const body = await response.text();
-    expect(body).toContain("Best Budget Smartwatches");
+    expect(body).toContain("Best Fitness Bands");
     // This test keyword has no target brands (see prisma/seed.ts), so it isn't
     // monetized — correctly, no disclosure renders for it. Disclosure rendering
     // itself is covered separately by the published seeded brand/top-picks pages.

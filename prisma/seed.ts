@@ -108,14 +108,17 @@ async function main() {
 
   // A distinct topic so the E2E generation test always starts with a fresh,
   // low-overlap uniqueness pool regardless of how many times the keywords above
-  // have already been generated/published.
+  // have already been generated/published. Kept separate from any keyword used
+  // for real published content — the E2E suite republishes this one on every
+  // run (that's the point of the test), which would otherwise clobber real
+  // content sharing the same keyword.
   console.log("Seeding E2E test keyword...");
   const usRegion = activeRegions.find((r) => r.code === "US")!;
   await prisma.keyword.upsert({
-    where: { regionId_slug: { regionId: usRegion.id, slug: "best-budget-smartwatches" } },
+    where: { regionId_slug: { regionId: usRegion.id, slug: "best-fitness-bands" } },
     create: {
-      text: "best budget smartwatches",
-      slug: "best-budget-smartwatches",
+      text: "best fitness bands",
+      slug: "best-fitness-bands",
       regionId: usRegion.id,
       pageType: "KEYWORD_REVIEW",
       category: "Electronics",
@@ -123,6 +126,27 @@ async function main() {
     },
     update: {},
   });
+
+  // A second brand-free KEYWORD_REVIEW keyword, distinct topic/category/region
+  // from the one above — informational content that never requires an
+  // affiliate mapping to publish, useful for verifying the real Content
+  // Engine pipeline without depending on a real affiliate program being
+  // configured yet.
+  const euRegion = activeRegions.find((r) => r.code === "EU");
+  if (euRegion) {
+    await prisma.keyword.upsert({
+      where: { regionId_slug: { regionId: euRegion.id, slug: "best-budget-laptops" } },
+      create: {
+        text: "best budget laptops",
+        slug: "best-budget-laptops",
+        regionId: euRegion.id,
+        pageType: "KEYWORD_REVIEW",
+        category: "Tech",
+        priority: 1,
+      },
+      update: {},
+    });
+  }
 
   console.log("Seed complete.");
 }

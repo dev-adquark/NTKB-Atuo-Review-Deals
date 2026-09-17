@@ -37,8 +37,10 @@ const CLAIM_REPAIRS: Array<{ pattern: RegExp; replace: (match: string) => string
     pattern: /\$\s?\d+(\.\d{2})?\b/g,
     // Never invent a different price — remove the unverified figure entirely;
     // the surrounding sentence is left to read generically rather than with a
-    // fabricated or admin-unverified number.
-    replace: () => "the current price",
+    // fabricated or admin-unverified number. No leading article, so this
+    // reads naturally after any preposition ("under", "at", "for") whether
+    // it lands in a title or in body prose.
+    replace: () => "current pricing",
     label: "unverified price figure",
   },
   {

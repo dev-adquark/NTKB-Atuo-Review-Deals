@@ -105,11 +105,34 @@ test.describe("site-wide link/route integrity", () => {
     }
   });
 
-  test("no page renders a duplicate header/footer, including 404 pages", async ({ page }) => {
-    for (const path of ["/", "/us", "/this-path-does-not-exist-12345", "/us/this-slug-does-not-exist", "/zz"]) {
+  test("no page renders a duplicate header/footer, including 404 pages and article pages", async ({ page }) => {
+    for (const path of [
+      "/",
+      "/us",
+      "/this-path-does-not-exist-12345",
+      "/us/this-slug-does-not-exist",
+      "/zz",
+      "/us/best-budget-smartwatches",
+    ]) {
       await page.goto(path);
-      await expect(page.locator("header"), `${path} must render exactly one header`).toHaveCount(1);
+      // Scoped to the one site-wide nav chrome, not every <header> tag on the
+      // page — an article page legitimately has its own semantic <header> for
+      // its title block (components/content/generated-page-view.tsx), which
+      // is a different, valid landmark, not a duplicated navbar.
+      await expect(page.locator("header").filter({ hasText: "NTKB" }), `${path} must render exactly one site header`).toHaveCount(1);
       await expect(page.locator("footer"), `${path} must render exactly one footer`).toHaveCount(1);
     }
+  });
+
+  test("an article with an attached Pexels image always shows required photographer/Pexels attribution", async ({ page }) => {
+    // Regression test: this attribution was stripped out by an external edit
+    // twice in one session. Pexels' API license requires visible credit on
+    // every image used — it must never silently disappear.
+    await page.goto("/us/best-budget-smartwatches");
+    await expect(page.locator("figure img")).toBeVisible();
+    const attribution = page.getByText(/Photo:.*\/\s*Pexels/);
+    await expect(attribution).toBeVisible();
+    const href = await attribution.getAttribute("href");
+    expect(href, "attribution must link to the real Pexels photo page").toMatch(/^https:\/\/www\.pexels\.com\//);
   });
 });

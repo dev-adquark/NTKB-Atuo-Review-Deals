@@ -53,7 +53,10 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {faqJsonLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} /> : null}
 
-      <header className="relative overflow-hidden border-b border-border-default bg-surface">
+      {/* A plain div, not a <header> — this project's convention reserves the
+          <header> tag for the one site-wide navigation chrome (components/layout/site-header.tsx),
+          which every automated "exactly one header per page" check assumes. */}
+      <div className="relative overflow-hidden border-b border-border-default bg-surface">
         <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -top-24 left-1/3 h-72 w-72 rounded-full bg-glow-a/15 blur-[100px]" />
         </div>
@@ -88,7 +91,7 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
             {generated.content.intro ? <Markdown className={MARKDOWN_CLASS}>{generated.content.intro}</Markdown> : null}
           </Reveal>
         </div>
-      </header>
+      </div>
 
       {content.image ? <ArticleImage image={content.image} /> : null}
 

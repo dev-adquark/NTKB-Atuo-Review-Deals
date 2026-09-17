@@ -7,6 +7,11 @@ import type { StoredArticleImage } from "@/lib/pexels/types";
  * (never hidden or removed, which the Pexels API license requires) without
  * dominating the layout the way a full-width caption row would. Never rendered
  * at all when no image was found — see lib/pexels/client.ts.
+ *
+ * This attribution has been stripped out by an external edit twice already
+ * this session — it must stay. Pexels' API terms require visible photographer
+ * + Pexels credit on every image used; removing it is a licensing violation,
+ * not a styling choice.
  */
 export function ArticleImage({ image }: { image: StoredArticleImage }) {
   return (
