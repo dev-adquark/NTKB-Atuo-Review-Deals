@@ -88,4 +88,28 @@ test.describe("site-wide link/route integrity", () => {
       expect(badHrefs, `${path} has placeholder/empty links`).toHaveLength(0);
     }
   });
+
+  test("every internal link on the homepage, a region hub, and the deals page resolves to a real page", async ({ page }) => {
+    test.setTimeout(60_000);
+    const seen = new Set<string>();
+    for (const path of ["/", "/us", "/eu", "/us/deals"]) {
+      await page.goto(path);
+      const hrefs = await page.locator("a[href]").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+      hrefs.forEach((h) => h && seen.add(h));
+    }
+    for (const href of seen) {
+      if (!href.startsWith("/") || href.startsWith("//")) continue; // external/protocol-relative
+      const target = href.split("#")[0] || "/";
+      const response = await page.request.get(target);
+      expect(response.status(), `${href} should resolve, not 404/dead-link`).toBe(200);
+    }
+  });
+
+  test("no page renders a duplicate header/footer, including 404 pages", async ({ page }) => {
+    for (const path of ["/", "/us", "/this-path-does-not-exist-12345", "/us/this-slug-does-not-exist", "/zz"]) {
+      await page.goto(path);
+      await expect(page.locator("header"), `${path} must render exactly one header`).toHaveCount(1);
+      await expect(page.locator("footer"), `${path} must render exactly one footer`).toHaveCount(1);
+    }
+  });
 });

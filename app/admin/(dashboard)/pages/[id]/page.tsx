@@ -106,6 +106,12 @@ export default async function AdminPageDetailPage({ params }: PageProps<"/admin/
             This page was generated in MOCK MODE — not real Content Generation Engine output.
           </p>
         ) : null}
+        {report?.repairsApplied && report.repairsApplied.length > 0 ? (
+          <p className="rounded-md border border-blue-300 bg-blue-50 px-2 py-1 text-xs text-blue-800">
+            Auto-repaired before this validation ran: {report.repairsApplied.join(", ")}. The flagged phrase was
+            softened/removed — no replacement price, statistic, or claim was invented.
+          </p>
+        ) : null}
         {report && report.issues.length > 0 ? (
           <ul className="list-disc space-y-1 pl-5 text-sm text-red-600">
             {report.issues.map((issue, i) => (

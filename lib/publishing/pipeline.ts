@@ -6,6 +6,7 @@ import { getContentEngineRuntimeConfig } from "@/lib/content-engine/config";
 import { callContentEngine } from "@/lib/content-engine/client";
 import { toExternalPageType } from "@/lib/types/page-type";
 import { validateGeneratedContent, validatePlaceholdersResolved, type ValidationIssue } from "@/lib/validation/content";
+import { repairProhibitedClaims } from "@/lib/validation/repair";
 import { computeUniqueness } from "@/lib/validation/uniqueness";
 import { buildDisclosureBlocks } from "@/lib/validation/disclosure";
 import { resolveAffiliateUrl, resolvePlaceholders } from "@/lib/affiliate/resolver";
@@ -149,7 +150,26 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
     return { ok: false, jobId: job.id, errorMessage: callResult.error.message };
   }
 
-  const structuralIssues = validateGeneratedContent(callResult.result, request);
+  let generatedResult = callResult.result;
+  let structuralIssues = validateGeneratedContent(generatedResult, request);
+  let repairsApplied: string[] = [];
+
+  // Recovery-first validation: a PROHIBITED_CLAIM hit doesn't have to end the
+  // request in a rejected draft. Deterministically soften/remove the exact
+  // flagged phrase (never invent a replacement price, statistic, or claim —
+  // see lib/validation/repair.ts) and validate the whole response again
+  // before deciding anything is actually unpublishable. This never calls the
+  // Content Generation Engine a second time; it only reprocesses the one
+  // response already received. Issues other than PROHIBITED_CLAIM (missing
+  // required sections, the provider's own quality verdict, etc.) can't be
+  // safely repaired without fabricating content, so they fall through
+  // unchanged to the normal DRAFT outcome below.
+  if (structuralIssues.some((issue) => issue.code === "PROHIBITED_CLAIM")) {
+    const repair = repairProhibitedClaims(generatedResult);
+    generatedResult = repair.result;
+    repairsApplied = repair.repaired;
+    structuralIssues = validateGeneratedContent(generatedResult, request);
+  }
 
   // Affiliate resolution
   const picks: StoredPick[] = [];
@@ -192,7 +212,7 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
   const vars: Record<string, string> = { region: region.code, keyword: request.keyword };
   if (brand) vars.brand_name = brand.name;
   if (brandAffiliate?.url) vars.brand_aff_url = brandAffiliate.url;
-  const { result: resolvedContent, unresolved } = deepReplaceText(callResult.result, vars);
+  const { result: resolvedContent, unresolved } = deepReplaceText(generatedResult, vars);
 
   const placeholderIssues = validatePlaceholdersResolved([...unresolved]);
 
@@ -275,6 +295,7 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
     uniquenessScore: uniqueness.score,
     duplicatedSections: uniqueness.duplicatedSections,
     passed: allIssues.length === 0,
+    repairsApplied: repairsApplied.length > 0 ? repairsApplied : undefined,
   };
 
   const version = await getNextVersion({

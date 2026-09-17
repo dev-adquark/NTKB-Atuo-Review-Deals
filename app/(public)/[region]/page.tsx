@@ -30,14 +30,23 @@ export default async function RegionHubPage({ params }: PageProps<"/[region]">) 
   const region = await getRegionByPrefix(regionPrefix);
   if (!region) notFound();
 
-  const [rankings, pages] = await Promise.all([
+  const [rankings, pages, brandReviewPages] = await Promise.all([
     prisma.brandRanking.findMany({ where: { regionId: region.id }, include: { brand: true }, orderBy: { rank: "asc" } }),
     prisma.generatedPage.findMany({
       where: { regionId: region.id, status: "PUBLISHED", isCurrent: true },
       orderBy: { publishedAt: "desc" },
       take: 30,
     }),
+    // A brand ranking is admin-configured independently of whether its review
+    // page has actually been generated and published yet — only link a rank
+    // card to a brand that has a real, live page behind it (never a dead link).
+    prisma.generatedPage.findMany({
+      where: { regionId: region.id, pageType: "BRAND_REVIEW", status: "PUBLISHED", isCurrent: true },
+      select: { brandId: true, canonicalPath: true },
+    }),
   ]);
+  const publishedBrandPath = new Map(brandReviewPages.map((p) => [p.brandId, p.canonicalPath]));
+  const rankedBrandsWithPages = rankings.filter((r) => publishedBrandPath.has(r.brandId));
 
   const cardData: ReviewCardData[] = pages.map((page) => ({
     id: page.id,
@@ -68,14 +77,14 @@ export default async function RegionHubPage({ params }: PageProps<"/[region]">) 
         </div>
       </section>
 
-      {rankings.length > 0 ? (
+      {rankedBrandsWithPages.length > 0 ? (
         <section className="mx-auto max-w-5xl px-4 py-14">
           <SectionHeading eyebrow="Ranked" title="Top brands in this region" align="left" />
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {rankings.map((r) => (
+            {rankedBrandsWithPages.map((r) => (
               <TiltCard key={r.id}>
                 <Link
-                  href={`/${region.urlPrefix}/reviews/${r.brand.slug}`}
+                  href={publishedBrandPath.get(r.brandId)!}
                   className="group flex items-center gap-4 rounded-2xl border border-border-default bg-surface p-5"
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 font-display text-sm font-medium text-primary">

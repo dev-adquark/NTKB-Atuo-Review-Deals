@@ -35,4 +35,9 @@ export interface ValidationReport {
   uniquenessScore: number;
   duplicatedSections: string[];
   passed: boolean;
+  /** Labels of prohibited-claim patterns that were automatically softened/removed
+   * before this report was produced (see lib/validation/repair.ts) — present only
+   * when a repair actually ran, so it's always visible in the admin UI and audit
+   * log rather than silently applied. */
+  repairsApplied?: string[];
 }
