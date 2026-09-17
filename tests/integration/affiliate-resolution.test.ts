@@ -25,10 +25,10 @@ describe("resolveAffiliateUrl (region isolation)", () => {
     euRegionId = eu.id;
 
     await prisma.affiliateMapping.create({
-      data: { brandId, regionId: usRegionId, url: "https://affiliate.example/test-brand/us", source: "ADMIN" },
+      data: { brandId, regionId: usRegionId, url: "https://shop.test-isolation-brand.com/us", source: "ADMIN" },
     });
     await prisma.affiliateMapping.create({
-      data: { brandId, regionId: inRegionId, url: "https://affiliate.example/test-brand/in", source: "ADMIN" },
+      data: { brandId, regionId: inRegionId, url: "https://shop.test-isolation-brand.com/in", source: "ADMIN" },
     });
     // Deliberately no mapping created for EU.
   });
@@ -40,18 +40,33 @@ describe("resolveAffiliateUrl (region isolation)", () => {
 
   it("resolves the US-specific URL for the US region", async () => {
     const resolved = await resolveAffiliateUrl(brandId, usRegionId);
-    expect(resolved?.url).toBe("https://affiliate.example/test-brand/us");
+    expect(resolved?.url).toBe("https://shop.test-isolation-brand.com/us");
     expect(resolved?.source).toBe("ADMIN");
   });
 
   it("resolves the IN-specific URL for the IN region, never the US one", async () => {
     const resolved = await resolveAffiliateUrl(brandId, inRegionId);
-    expect(resolved?.url).toBe("https://affiliate.example/test-brand/in");
-    expect(resolved?.url).not.toBe("https://affiliate.example/test-brand/us");
+    expect(resolved?.url).toBe("https://shop.test-isolation-brand.com/in");
+    expect(resolved?.url).not.toBe("https://shop.test-isolation-brand.com/us");
   });
 
   it("returns null (never a fabricated or cross-region URL) when no mapping exists", async () => {
     const resolved = await resolveAffiliateUrl(brandId, euRegionId);
     expect(resolved).toBeNull();
+  });
+
+  it("treats a placeholder/example destination as no mapping at all, never resolving it", async () => {
+    const placeholderBrand = await prisma.brand.create({
+      data: { name: `Test Placeholder Brand ${Date.now()}`, slug: `test-placeholder-brand-${Date.now()}` },
+    });
+    await prisma.affiliateMapping.create({
+      data: { brandId: placeholderBrand.id, regionId: usRegionId, url: "https://affiliate.example/placeholder", source: "ADMIN" },
+    });
+
+    const resolved = await resolveAffiliateUrl(placeholderBrand.id, usRegionId);
+    expect(resolved).toBeNull();
+
+    await prisma.affiliateMapping.deleteMany({ where: { brandId: placeholderBrand.id } });
+    await prisma.brand.delete({ where: { id: placeholderBrand.id } });
   });
 });

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { logAudit } from "@/lib/audit";
 import { getOrCreatePlatformSettings } from "@/lib/settings";
 import { AFFILIATE_NETWORK_PROVIDERS } from "./networks";
+import { isRealAffiliateDestination } from "./url-safety";
 import type { AffiliateSource } from "@/app/generated/prisma/client";
 
 export interface ResolvedAffiliate {
@@ -22,7 +23,12 @@ export async function resolveAffiliateUrl(brandId: string, regionId: string): Pr
   const mapping = await prisma.affiliateMapping.findUnique({
     where: { brandId_regionId: { brandId, regionId } },
   });
-  if (mapping && mapping.active) return { url: mapping.url, source: mapping.source };
+  // A placeholder/example destination (e.g. left over from demo seed data) is
+  // never a real affiliate offer — treat it exactly like no mapping exists at
+  // all, rather than silently sending a visitor to a domain that doesn't work.
+  if (mapping && mapping.active && isRealAffiliateDestination(mapping.url)) {
+    return { url: mapping.url, source: mapping.source };
+  }
 
   const settings = await getOrCreatePlatformSettings();
   if (!settings.networkFallbackEnabled || AFFILIATE_NETWORK_PROVIDERS.length === 0) return null;

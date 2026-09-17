@@ -216,8 +216,22 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
 
   const placeholderIssues = validatePlaceholdersResolved([...unresolved]);
 
-  // Uniqueness
-  const uniqueness = await computeUniqueness(resolvedContent.content.sections, input.pageType);
+  // Uniqueness — excludes prior versions of this exact keyword/brand+region
+  // "slot" from the comparison pool. Regenerating the same page (via the
+  // "Regenerate" admin action, or re-running this same generation input) is
+  // expected to happen repeatedly; comparing a new attempt against its own
+  // previous self would make every subsequent regeneration of the same
+  // keyword strictly harder over time for no real reason — uniqueness exists
+  // to catch duplicating OTHER content, not to catch a page resembling itself.
+  const priorVersions = await prisma.generatedPage.findMany({
+    where: { regionId: region.id, pageType: input.pageType, keywordId: keyword?.id ?? null, brandId: brand?.id ?? null },
+    select: { id: true },
+  });
+  const uniqueness = await computeUniqueness(
+    resolvedContent.content.sections,
+    input.pageType,
+    priorVersions.map((p) => p.id),
+  );
   const uniquenessIssues: ValidationIssue[] =
     uniqueness.score < settings.uniquenessMinScore
       ? [

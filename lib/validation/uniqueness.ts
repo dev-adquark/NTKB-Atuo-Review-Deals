@@ -42,8 +42,9 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
 export async function computeUniqueness(
   candidateSections: GeneratedContentSection[],
   pageType: PageType,
-  excludePageId?: string,
+  excludePageId?: string | string[],
 ): Promise<UniquenessResult> {
+  const excludeIds = excludePageId ? (Array.isArray(excludePageId) ? excludePageId : [excludePageId]) : [];
   const existingPages = await prisma.generatedPage.findMany({
     where: {
       pageType,
@@ -54,7 +55,7 @@ export async function computeUniqueness(
       // making the pool progressively harder to pass without adding any real
       // diversity — a rejected page was never real content worth protecting.
       status: { not: "DRAFT" },
-      ...(excludePageId ? { id: { not: excludePageId } } : {}),
+      ...(excludeIds.length > 0 ? { id: { notIn: excludeIds } } : {}),
     },
     orderBy: { createdAt: "desc" },
     take: COMPARISON_SAMPLE_SIZE,

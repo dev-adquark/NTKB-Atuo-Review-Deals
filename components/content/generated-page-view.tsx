@@ -108,7 +108,7 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
                   </span>
                   {pick.affiliateUrl ? (
                     <AffiliateCtaLink
-                      href={`/click/${pick.brandId}?destination=${encodeURIComponent(pick.affiliateUrl)}&page=${encodeURIComponent(page.id)}`}
+                      href={`/click/${pick.brandId}?page=${encodeURIComponent(page.id)}`}
                       brandId={pick.brandId}
                       pageId={page.id}
                       region={page.region.code}
@@ -129,7 +129,7 @@ export async function GeneratedPageView({ page }: { page: PageWithRelations }) {
         {content.brand?.affiliateUrl ? (
           <Reveal className="mt-6">
             <AffiliateCtaLink
-              href={`/click/${content.brand.id}?destination=${encodeURIComponent(content.brand.affiliateUrl)}&page=${encodeURIComponent(page.id)}`}
+              href={`/click/${content.brand.id}?page=${encodeURIComponent(page.id)}`}
               brandId={content.brand.id}
               pageId={page.id}
               region={page.region.code}

@@ -90,5 +90,14 @@ describe("computeUniqueness", () => {
       );
       expect(result.duplicatedSections).not.toContain(DISTINCTIVE_HEADING);
     });
+
+    it("also accepts an array of page IDs to exclude (used when regenerating a keyword that already has prior published versions)", async () => {
+      const result = await computeUniqueness(
+        [{ heading: DISTINCTIVE_HEADING, level: 2, content: DISTINCTIVE_CONTENT }],
+        "KEYWORD_REVIEW",
+        [pageId, "some-other-nonexistent-id"],
+      );
+      expect(result.duplicatedSections).not.toContain(DISTINCTIVE_HEADING);
+    });
   });
 });

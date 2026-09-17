@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+const ADMIN_EMAIL = process.env.ADMIN_BOOTSTRAP_EMAIL!;
+const ADMIN_PASSWORD = process.env.ADMIN_BOOTSTRAP_PASSWORD!;
+
 test.describe("security: auth gating and open-redirect protection", () => {
   test("every admin route redirects to login when unauthenticated", async ({ page }) => {
     for (const path of [
@@ -38,24 +41,46 @@ test.describe("security: auth gating and open-redirect protection", () => {
     expect([401, 503]).toContain(wrongSecret.status());
   });
 
-  test("click redirect only ever forwards to a real, currently-active affiliate mapping URL", async ({ page, request }) => {
-    // Find a real /click/ link from a live public page rather than guessing an ID.
-    await page.goto("/us/best-wireless-earbuds");
-    const clickHref = await page.locator('a[href^="/click/"]').first().getAttribute("href");
-    expect(clickHref).toBeTruthy();
+  test("click redirect never forwards to a placeholder/example destination, and a destination query param is structurally ignored", async ({ page: browserPage, request }) => {
+    // Discover a real brandId and pageId the same way an admin would — via the
+    // admin UI's own detail-view links — rather than importing Prisma directly
+    // (Playwright's test runner doesn't share Next.js's module loader for the
+    // generated Prisma client).
+    await browserPage.goto("/admin/login");
+    await browserPage.fill('input[name="email"]', ADMIN_EMAIL);
+    await browserPage.fill('input[name="password"]', ADMIN_PASSWORD);
+    await browserPage.click('button[type="submit"]');
+    await browserPage.waitForURL("/admin");
 
-    const legit = await request.get(clickHref!, { maxRedirects: 0 });
-    expect([301, 302, 307, 308]).toContain(legit.status());
-    const legitLocation = legit.headers()["location"];
-    expect(legitLocation).toMatch(/^https:\/\/affiliate\.example\//);
+    await browserPage.goto("/admin/brands");
+    const brandRow = browserPage.locator("tr", { hasText: "PulseGear" });
+    const brandHref = await brandRow.locator('a[href^="/admin/brands/"]').getAttribute("href");
+    const brandId = brandHref!.split("/").pop()!;
 
-    // Tamper with the destination — must NOT be honored as an open redirect.
-    const url = new URL(clickHref!, "http://localhost");
-    url.searchParams.set("destination", "https://evil.example/phish");
-    const tampered = await request.get(url.pathname + url.search, { maxRedirects: 0 });
+    // pulsegear's only configured mapping is the demo affiliate.example placeholder
+    // (see prisma/seed.ts) — resolveAffiliateUrl() must treat that as no mapping.
+    await browserPage.goto("/admin/pages");
+    const pageRow = browserPage.locator("tr", { hasText: "PulseGear Review (US)" });
+    const pageHref = await pageRow.locator('a[href^="/admin/pages/"]').getAttribute("href");
+    const pageId = pageHref!.split("/").pop()!;
+
+    const noQuery = await request.get(`/click/${brandId}`, { maxRedirects: 0 });
+    expect([301, 302, 307, 308]).toContain(noQuery.status());
+    expect(noQuery.headers()["location"]).not.toContain("affiliate.example");
+
+    const placeholderMapping = await request.get(`/click/${brandId}?page=${pageId}`, { maxRedirects: 0 });
+    expect([301, 302, 307, 308]).toContain(placeholderMapping.status());
+    expect(placeholderMapping.headers()["location"], "a placeholder mapping must never be forwarded to").not.toContain("affiliate.example");
+
+    // The route no longer reads a client-supplied destination at all — passing
+    // one must have zero effect, proving the open-redirect surface is closed
+    // structurally rather than merely validated away.
+    const tampered = await request.get(`/click/${brandId}?page=${pageId}&destination=${encodeURIComponent("https://evil.example/phish")}`, {
+      maxRedirects: 0,
+    });
     expect([301, 302, 307, 308]).toContain(tampered.status());
-    const tamperedLocation = tampered.headers()["location"];
-    expect(tamperedLocation).not.toContain("evil.example");
+    expect(tampered.headers()["location"]).not.toContain("evil.example");
+    expect(tampered.headers()["location"]).toEqual(placeholderMapping.headers()["location"]);
   });
 
   test("draft/preview pages are not indexable (noindex or not publicly listed)", async ({ request }) => {

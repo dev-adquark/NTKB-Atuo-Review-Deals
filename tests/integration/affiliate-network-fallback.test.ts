@@ -20,7 +20,7 @@ describe("resolveAffiliateUrl — network fallback never overrides an admin mapp
     regionId = region.id;
 
     await prisma.affiliateMapping.create({
-      data: { brandId, regionId, url: "https://affiliate.example/admin-set", source: "ADMIN" },
+      data: { brandId, regionId, url: "https://shop.test-network-fallback-brand.com/admin-set", source: "ADMIN" },
     });
   });
 
@@ -33,7 +33,7 @@ describe("resolveAffiliateUrl — network fallback never overrides an admin mapp
   it("returns the existing admin mapping even when network fallback is enabled", async () => {
     await prisma.platformSettings.update({ where: { id: "singleton" }, data: { networkFallbackEnabled: true } });
     const resolved = await resolveAffiliateUrl(brandId, regionId);
-    expect(resolved).toEqual({ url: "https://affiliate.example/admin-set", source: "ADMIN" });
+    expect(resolved).toEqual({ url: "https://shop.test-network-fallback-brand.com/admin-set", source: "ADMIN" });
   });
 
   it("never invokes network lookup when fallback is disabled and no mapping exists", async () => {
