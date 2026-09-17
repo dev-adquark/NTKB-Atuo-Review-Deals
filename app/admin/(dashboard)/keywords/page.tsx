@@ -36,7 +36,7 @@ export default async function AdminKeywordsPage() {
                 <td className="p-3">{keyword.priority}</td>
                 <td className="p-3">
                   <form action={updateKeywordStatusAction.bind(null, keyword.id)} className="flex items-center gap-1">
-                    <select name="status" defaultValue={keyword.status} className="rounded-md border border-neutral-300 px-2 py-1 text-xs">
+                    <select name="status" defaultValue={keyword.status} className="rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-900 placeholder:text-neutral-400">
                       <option value="ACTIVE">Active</option>
                       <option value="PAUSED">Paused</option>
                       <option value="ARCHIVED">Archived</option>
@@ -64,11 +64,11 @@ export default async function AdminKeywordsPage() {
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <p className="text-xs text-neutral-500">Keyword</p>
-            <input name="text" required placeholder="best mattresses" className="rounded-md border border-neutral-300 px-2 py-2 text-sm" />
+            <input name="text" required placeholder="best mattresses" className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400" />
           </div>
           <div>
             <p className="text-xs text-neutral-500">Region</p>
-            <select name="regionId" required className="rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="regionId" required className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               {regions.map((region) => (
                 <option key={region.id} value={region.id}>
                   {region.code}
@@ -78,18 +78,18 @@ export default async function AdminKeywordsPage() {
           </div>
           <div>
             <p className="text-xs text-neutral-500">Page type</p>
-            <select name="pageType" required className="rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="pageType" required className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               <option value="KEYWORD_REVIEW">Keyword Review Landing</option>
               <option value="TOP_PICKS">Top Picks / Deal Roundup</option>
             </select>
           </div>
           <div>
             <p className="text-xs text-neutral-500">Category</p>
-            <input name="category" className="rounded-md border border-neutral-300 px-2 py-2 text-sm" />
+            <input name="category" className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400" />
           </div>
           <div>
             <p className="text-xs text-neutral-500">Priority</p>
-            <input name="priority" type="number" defaultValue={0} className="w-20 rounded-md border border-neutral-300 px-2 py-2 text-sm" />
+            <input name="priority" type="number" defaultValue={0} className="w-20 rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900" />
           </div>
           <button type="submit" className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800">
             Add

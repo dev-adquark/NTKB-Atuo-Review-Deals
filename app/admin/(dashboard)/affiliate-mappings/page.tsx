@@ -44,7 +44,7 @@ export default async function AdminAffiliateMappingsPage() {
                           type="url"
                           defaultValue={mapping?.url ?? ""}
                           placeholder="https://…"
-                          className="w-40 rounded-md border border-neutral-300 px-2 py-1 text-xs"
+                          className="w-40 rounded-md border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-900"
                         />
                         <button type="submit" className="text-xs text-neutral-600 underline">
                           Save

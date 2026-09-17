@@ -45,7 +45,7 @@ function NumberField({ label, name, defaultValue, step }: { label: string; name:
         type="number"
         step={step}
         defaultValue={defaultValue}
-        className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm"
+        className="w-full rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
       />
     </div>
   );

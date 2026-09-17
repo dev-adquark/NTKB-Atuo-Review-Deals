@@ -55,7 +55,7 @@ export default async function AdminBrandDetailPage({ params }: PageProps<"/admin
                         min={1}
                         defaultValue={ranking?.rank ?? ""}
                         placeholder="—"
-                        className="w-16 rounded-md border border-neutral-300 px-2 py-1 text-sm"
+                        className="w-16 rounded-md border border-neutral-300 bg-white px-2 py-1 text-sm text-neutral-900"
                       />
                       <button type="submit" className="text-xs text-neutral-600 underline">
                         Save
@@ -86,7 +86,7 @@ function Field({ label, name, defaultValue, full }: { label: string; name: strin
       <input
         name={name}
         defaultValue={defaultValue}
-        className={`rounded-md border border-neutral-300 px-2 py-2 text-sm ${full ? "w-full" : ""}`}
+        className={`rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 ${full ? "w-full" : ""}`}
       />
     </div>
   );

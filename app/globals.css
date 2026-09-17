@@ -7,8 +7,10 @@
   border-default, etc.) rather than raw Tailwind palette classes like
   text-neutral-900 — raw palette classes never adapt to the dark class and are
   exactly what made dark mode unreadable before this file existed. Admin screens
-  intentionally keep their existing light-only neutral-* classes: they carry no
-  dark: variants, so they render identically regardless of the html class.
+  intentionally keep their existing light-only neutral-* classes and never
+  toggle the dark class — but they still need the .admin-light-scope class
+  below (color-scheme: light) so the visitor's OS/browser dark-mode preference
+  can't independently dark-style native form controls out from under them.
 */
 :root {
   --background: #faf9f7;
@@ -119,4 +121,34 @@ body,
 .prose-content :where(strong) {
   font-weight: 600;
   color: var(--foreground);
+}
+
+/*
+  Admin is intentionally light-only and never toggles the .dark class, but native
+  form controls (input/select/textarea) don't just follow this app's class — the
+  browser also auto-styles them from the *visitor's OS/browser* dark-mode
+  preference whenever a page doesn't declare its own color-scheme. Left
+  undeclared, that gave admin inputs a browser-native dark background while
+  Tailwind Preflight's inherited `color` kept the text near-black (from the
+  light-mode neutral-900 classes on ancestors) — dark-on-dark, e.g. the login
+  password field. Declaring color-scheme: light opts every admin form control
+  out of that auto-dark-styling, independent of the visitor's system setting.
+*/
+.admin-light-scope {
+  color-scheme: light;
+}
+
+/* Chrome/Safari autofill paints its own background + text color, ignoring the
+   input's own classes, and can reproduce the same unreadable combination even
+   with color-scheme set. Force it back to the same light colors admin already
+   uses everywhere else. */
+.admin-light-scope input:-webkit-autofill,
+.admin-light-scope input:-webkit-autofill:hover,
+.admin-light-scope input:-webkit-autofill:focus,
+.admin-light-scope select:-webkit-autofill {
+  -webkit-text-fill-color: #171717;
+  caret-color: #171717;
+  box-shadow: 0 0 0px 1000px #ffffff inset;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  transition: background-color 9999s ease-in-out 0s;
 }

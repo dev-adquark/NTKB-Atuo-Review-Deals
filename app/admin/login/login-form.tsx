@@ -20,7 +20,7 @@ export function LoginForm() {
           type="email"
           required
           autoComplete="email"
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
+          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 caret-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900"
         />
       </div>
       <div className="space-y-1">
@@ -33,7 +33,7 @@ export function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
-          className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-neutral-900"
+          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 caret-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900"
         />
       </div>
       {state.error ? <p className="text-sm text-red-600">{state.error}</p> : null}

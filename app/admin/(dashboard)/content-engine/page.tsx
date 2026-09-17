@@ -38,7 +38,7 @@ export default async function AdminContentEnginePage() {
               type="password"
               placeholder={config.hasApiKey ? "Leave blank to keep current key" : "Enter API key"}
               autoComplete="off"
-              className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm"
+              className="w-full rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
             />
           </div>
           <Field label="Timeout (ms)" name="timeoutMs" type="number" defaultValue={String(config.timeoutMs)} />
@@ -48,7 +48,7 @@ export default async function AdminContentEnginePage() {
               name="retryCount"
               type="number"
               defaultValue={String(config.retryCount)}
-              className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm"
+              className="w-full rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
             />
           </div>
         </div>
@@ -56,7 +56,7 @@ export default async function AdminContentEnginePage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
             <p className="text-xs text-neutral-500">Tone</p>
-            <select name="defaultTone" defaultValue={config.defaultTone} className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="defaultTone" defaultValue={config.defaultTone} className="w-full rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               <option value="professional">Professional</option>
               <option value="friendly">Friendly</option>
               <option value="bold">Bold</option>
@@ -65,7 +65,7 @@ export default async function AdminContentEnginePage() {
           <Field label="Max words per generation" name="defaultMaxWords" type="number" defaultValue={String(config.defaultMaxWords)} />
           <div>
             <p className="text-xs text-neutral-500">Factuality mode</p>
-            <select name="factualityMode" defaultValue={config.factualityMode} className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="factualityMode" defaultValue={config.factualityMode} className="w-full rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               <option value="standard">Standard</option>
               <option value="verified">Verified</option>
             </select>
@@ -113,7 +113,7 @@ function Field({
         type={type ?? "text"}
         defaultValue={defaultValue}
         placeholder={placeholder}
-        className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm"
+        className="w-full rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
       />
     </div>
   );

@@ -47,7 +47,7 @@ export function GenerationForm({
             name="regionId"
             value={regionId}
             onChange={(e) => setRegionId(e.target.value)}
-            className="rounded-md border border-neutral-300 px-2 py-2 text-sm"
+            className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
           >
             {regions.map((r) => (
               <option key={r.id} value={r.id}>
@@ -62,7 +62,7 @@ export function GenerationForm({
             name="pageType"
             value={pageType}
             onChange={(e) => setPageType(e.target.value as typeof pageType)}
-            className="rounded-md border border-neutral-300 px-2 py-2 text-sm"
+            className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
           >
             <option value="KEYWORD_REVIEW">Keyword Review Landing</option>
             <option value="BRAND_REVIEW">Brand Review</option>
@@ -73,7 +73,7 @@ export function GenerationForm({
         {pageType === "BRAND_REVIEW" ? (
           <div>
             <p className="text-xs text-neutral-500">Brand</p>
-            <select name="brandId" required className="rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="brandId" required className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -84,7 +84,7 @@ export function GenerationForm({
         ) : (
           <div>
             <p className="text-xs text-neutral-500">Keyword</p>
-            <select name="keywordId" required className="rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="keywordId" required className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               {filteredKeywords.map((k) => (
                 <option key={k.id} value={k.id}>
                   {k.text}

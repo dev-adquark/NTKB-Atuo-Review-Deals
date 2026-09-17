@@ -19,7 +19,7 @@ export default async function AdminSearchPage({ searchParams }: PageProps<"/admi
           name="q"
           defaultValue={query}
           placeholder="Search…"
-          className="w-full max-w-md rounded-md border border-neutral-300 px-3 py-2 text-sm"
+          className="w-full max-w-md rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
         />
         <button type="submit" className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800">
           Search

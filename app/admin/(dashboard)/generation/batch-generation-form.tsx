@@ -39,7 +39,7 @@ export function BatchGenerationForm({ regions, keywords }: { regions: RegionOpti
             name="regionId"
             value={regionId}
             onChange={(e) => setRegionId(e.target.value)}
-            className="rounded-md border border-neutral-300 px-2 py-2 text-sm"
+            className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
           >
             {regions.map((r) => (
               <option key={r.id} value={r.id}>
@@ -54,7 +54,7 @@ export function BatchGenerationForm({ regions, keywords }: { regions: RegionOpti
             name="pageType"
             value={pageType}
             onChange={(e) => setPageType(e.target.value as typeof pageType)}
-            className="rounded-md border border-neutral-300 px-2 py-2 text-sm"
+            className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
           >
             <option value="KEYWORD_REVIEW">Keyword Review Landing</option>
             <option value="TOP_PICKS">Top Picks / Deal Roundup</option>

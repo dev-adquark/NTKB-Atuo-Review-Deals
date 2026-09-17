@@ -67,7 +67,7 @@ function Field({ label, name, placeholder, full }: { label: string; name: string
       <input
         name={name}
         placeholder={placeholder}
-        className={`rounded-md border border-neutral-300 px-2 py-2 text-sm ${full ? "w-full" : ""}`}
+        className={`rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 ${full ? "w-full" : ""}`}
       />
     </div>
   );

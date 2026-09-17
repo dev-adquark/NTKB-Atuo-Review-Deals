@@ -22,7 +22,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   const session = await requireAdminPage();
 
   return (
-    <div className="min-h-screen bg-neutral-50 md:flex">
+    <div className="admin-light-scope min-h-screen bg-neutral-50 md:flex">
       <aside className="border-b border-neutral-200 bg-white md:w-60 md:shrink-0 md:border-b-0 md:border-r">
         <div className="p-4">
           <p className="text-sm font-semibold text-neutral-900">NTKB Admin</p>

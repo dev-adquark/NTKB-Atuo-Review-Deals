@@ -69,7 +69,7 @@ export default async function AdminSponsoredPage() {
           <Field label="Sponsor label" name="sponsorLabel" placeholder="Sponsored — Brand Spotlight" />
           <div>
             <p className="text-xs text-neutral-500">Brand</p>
-            <select name="brandId" required className="rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="brandId" required className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -79,7 +79,7 @@ export default async function AdminSponsoredPage() {
           </div>
           <div>
             <p className="text-xs text-neutral-500">Region</p>
-            <select name="regionId" required className="rounded-md border border-neutral-300 px-2 py-2 text-sm">
+            <select name="regionId" required className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
               {regions.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.code}
@@ -99,7 +99,7 @@ export default async function AdminSponsoredPage() {
             name="disclosure"
             required
             placeholder="This is a paid partnership with Example Brand."
-            className="w-full rounded-md border border-neutral-300 px-2 py-2 text-sm"
+            className="w-full rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
           />
         </div>
         <button type="submit" className="rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white hover:bg-neutral-800">
@@ -114,7 +114,7 @@ function Field({ label, name, placeholder, type }: { label: string; name: string
   return (
     <div>
       <p className="text-xs text-neutral-500">{label}</p>
-      <input name={name} type={type ?? "text"} placeholder={placeholder} className="rounded-md border border-neutral-300 px-2 py-2 text-sm" />
+      <input name={name} type={type ?? "text"} placeholder={placeholder} className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400" />
     </div>
   );
 }

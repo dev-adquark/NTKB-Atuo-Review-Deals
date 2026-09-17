@@ -47,7 +47,7 @@ export default async function AdminRegionsPage() {
           <div className="flex flex-wrap items-end gap-3">
             <div>
               <p className="text-xs text-neutral-500">Code</p>
-              <select name="code" className="rounded-md border border-neutral-300 px-2 py-2 text-sm">
+              <select name="code" className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400">
                 {availableCodes.map((code) => (
                   <option key={code} value={code}>
                     {code}
@@ -88,7 +88,7 @@ function Field({
         defaultValue={defaultValue}
         placeholder={placeholder}
         required
-        className="rounded-md border border-neutral-300 px-2 py-2 text-sm"
+        className="rounded-md border border-neutral-300 bg-white px-2 py-2 text-sm text-neutral-900 placeholder:text-neutral-400"
       />
     </div>
   );
