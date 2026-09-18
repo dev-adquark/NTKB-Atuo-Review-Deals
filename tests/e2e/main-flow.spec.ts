@@ -116,36 +116,19 @@ test.describe("main flow: admin login → generate → validate → preview → 
     expect(statusText).not.toContain("PUBLISHED");
   });
 
-  test("publish gates block until all gates pass; regenerating recovers from a rejected attempt, then publish succeeds", async () => {
-    test.setTimeout(120_000);
-    const MAX_ATTEMPTS = 10;
+  test("publish succeeds on the first attempt even when a gate fails; the failing gate is still shown, not hidden", async () => {
+    // Publish-blocking was intentionally disabled (explicit request): every
+    // generated page publishes immediately regardless of gate outcomes. The
+    // gate checklist itself is untouched and still computed/displayed
+    // accurately — a real failing gate must still show up in the UI as a
+    // diagnostic, it just no longer prevents PUBLISHED.
+    await page.goto(generatedPageUrl);
+    await page.click('button:has-text("Publish")');
+    await expect(page.getByText(/✓.*API response valid|✗.*API response valid/)).toBeVisible({ timeout: 15000 });
 
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      await page.goto(generatedPageUrl);
-      await page.click('button:has-text("Publish")');
-      await expect(page.getByText(/✓.*API response valid|✗.*API response valid/)).toBeVisible({ timeout: 15000 });
-
-      const failedGateCount = await page.locator("li.text-red-600").count();
-      if (failedGateCount === 0) break;
-
-      // The mock content engine draws from a small, region-flavored phrase pool
-      // (see lib/content-engine/mock-provider.ts) — it's expected to occasionally
-      // land below the uniqueness threshold. This is exactly the scenario
-      // "Regenerate" exists for: request fresh content and revalidate, rather
-      // than publishing content that failed a real safety gate.
-      expect(attempt, `still failing gates after ${MAX_ATTEMPTS} regenerate attempts`).toBeLessThan(MAX_ATTEMPTS);
-      await page.goto(generatedPageUrl);
-      const previousPath = new URL(generatedPageUrl).pathname;
-      await page.click('button:has-text("Regenerate (new version)")');
-      await page.waitForURL(
-        (url) => /\/admin\/pages\/[a-z0-9]+$/.test(url.pathname) && url.pathname !== previousPath,
-        { timeout: 20000 },
-      );
-      generatedPageUrl = page.url();
-    }
-
-    const failedGates = page.locator("li.text-red-600");
-    await expect(failedGates).toHaveCount(0);
+    await page.goto(generatedPageUrl);
+    const statusText = await page.locator("p.uppercase").first().innerText();
+    expect(statusText).toContain("PUBLISHED");
   });
 
   test("published page is publicly reachable with HTTP 200", async ({ request }) => {

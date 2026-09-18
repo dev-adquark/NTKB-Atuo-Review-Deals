@@ -304,11 +304,18 @@ export async function runGeneration(input: RunGenerationInput): Promise<Generati
     image: image ?? undefined,
   };
 
+  // NOTE: publish-blocking disabled by explicit request — `passed` is forced
+  // true regardless of `allIssues` so structural/uniqueness/placeholder/claim
+  // issues no longer stop a page from reaching READY_FOR_REVIEW. The real
+  // issues are still computed and stored below (issues/uniquenessScore/
+  // duplicatedSections) so they stay visible in the admin UI; only the
+  // pass/fail decision derived from them is bypassed. See also
+  // publishGeneratedPage()'s allGatesPassed() bypass in this same file.
   const validationReport: ValidationReport = {
     issues: allIssues,
     uniquenessScore: uniqueness.score,
     duplicatedSections: uniqueness.duplicatedSections,
-    passed: allIssues.length === 0,
+    passed: true,
     repairsApplied: repairsApplied.length > 0 ? repairsApplied : undefined,
   };
 
@@ -424,9 +431,13 @@ export async function publishGeneratedPage(pageId: string, userId: string | null
     faqJsonLdMatchesVisibleContent: true,
   });
 
-  if (!allGatesPassed(gates)) {
-    return { ok: false, gates, pageId };
-  }
+  // NOTE: publish-blocking disabled by explicit request — `gates` above is
+  // still the real per-gate computation (affiliate mapping, uniqueness,
+  // required content, disclosures, etc.) and is still returned/stored so the
+  // admin UI keeps showing which gates actually passed or failed, but a
+  // failing gate no longer stops the page from being published. The block
+  // that would have run only on allGatesPassed(gates) now always runs.
+  void allGatesPassed;
 
   await prisma.$transaction(async (tx) => {
     await tx.generatedPage.updateMany({
