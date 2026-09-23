@@ -1,0 +1,484 @@
+**Here is a refined, professional-grade set of 3D + rotating + human character graphics**  
+Specifically designed for **Mattress Match Score** (https://mattres-liart.vercel.app/).  
+
+Clean geometry, smooth timing, subtle depth, accurate sleep-position silhouettes, and production-ready code. All pure CSS (minimal JS only where interaction is needed).
+
+### 01 — Professional 3D Rotating Mattress
+```html
+<div class="pro-mattress">
+  <div class="face top"></div>
+  <div class="face side-l"></div>
+  <div class="face side-r"></div>
+  <div class="face front"></div>
+</div>
+<style>
+.pro-mattress {
+  width: 200px;
+  height: 36px;
+  position: relative;
+  margin: 70px auto;
+  transform-style: preserve-3d;
+  animation: proMatRotate 14s linear infinite;
+}
+.pro-mattress .face {
+  position: absolute;
+  background: linear-gradient(145deg, #e0f7fa 0%, #22d3ee 55%, #0ea5e9 100%);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.pro-mattress .top {
+  width: 200px; height: 110px;
+  transform: rotateX(90deg) translateZ(18px);
+  background: linear-gradient(145deg, #f0f9ff, #67e8f9);
+  box-shadow: inset 0 0 30px rgba(14,165,233,0.15);
+}
+.pro-mattress .front {
+  width: 200px; height: 36px;
+  transform: translateZ(55px);
+}
+.pro-mattress .side-l {
+  width: 110px; height: 36px;
+  transform: rotateY(-90deg) translateZ(100px);
+}
+.pro-mattress .side-r {
+  width: 110px; height: 36px;
+  transform: rotateY(90deg) translateZ(100px);
+}
+@keyframes proMatRotate {
+  to { transform: rotateY(360deg) rotateX(6deg); }
+}
+</style>
+```
+
+### 02 — Side Sleeper (Professional Human)
+```html
+<div class="pro-side">
+  <div class="head"></div>
+  <div class="torso"></div>
+  <div class="arm"></div>
+  <div class="leg"></div>
+</div>
+<style>
+.pro-side {
+  position: relative;
+  width: 210px;
+  height: 78px;
+  transform-style: preserve-3d;
+  animation: proSideFloat 6.5s ease-in-out infinite;
+}
+.pro-side .head {
+  position: absolute;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #f0f9ff, #22d3ee);
+  top: 16px; left: 18px;
+  box-shadow: 0 0 22px rgba(34,211,238,0.45);
+}
+.pro-side .torso {
+  position: absolute;
+  width: 105px; height: 26px;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #67e8f9, #22d3ee);
+  top: 32px; left: 42px;
+  transform: rotateY(-8deg);
+}
+.pro-side .arm {
+  position: absolute;
+  width: 48px; height: 11px;
+  border-radius: 8px;
+  background: #67e8f9;
+  top: 48px; left: 75px;
+  transform: rotate(-18deg);
+}
+.pro-side .leg {
+  position: absolute;
+  width: 68px; height: 13px;
+  border-radius: 9px;
+  background: #0ea5e9;
+  top: 52px; left: 125px;
+  transform: rotate(8deg);
+}
+@keyframes proSideFloat {
+  50% { transform: translateY(-7px) rotateX(3deg); }
+}
+</style>
+```
+
+### 03 — 3D Match Score Orb (Rotating)
+```html
+<div class="pro-orb">
+  <div class="sphere"></div>
+  <div class="ring"></div>
+  <div class="value">94</div>
+</div>
+<style>
+.pro-orb {
+  position: relative;
+  width: 150px; height: 150px;
+  display: grid;
+  place-items: center;
+  transform-style: preserve-3d;
+}
+.pro-orb .sphere {
+  position: absolute;
+  inset: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 28%, #e0f7fa 0%, #22d3ee 45%, #0c4a6e 100%);
+  box-shadow:
+    inset -18px -12px 28px rgba(0,0,0,0.35),
+    0 0 45px rgba(34,211,238,0.5);
+  animation: proSphere 9s linear infinite;
+}
+.pro-orb .ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(34,211,238,0.4);
+  border-radius: 50%;
+  transform: rotateX(68deg);
+  animation: proRing 7s linear infinite;
+}
+.pro-orb .value {
+  position: relative;
+  z-index: 2;
+  font: 700 34px/1 system-ui;
+  color: #e0f7fa;
+  text-shadow: 0 0 24px rgba(34,211,238,0.7);
+}
+@keyframes proSphere { to { transform: rotateY(360deg); } }
+@keyframes proRing { to { transform: rotateX(68deg) rotateZ(360deg); } }
+</style>
+```
+
+### 04 — Professional X-Ray Layer Stack
+```html
+<div class="pro-xray">
+  <div class="layer l1">Cooling Cover</div>
+  <div class="layer l2">Comfort Layer</div>
+  <div class="layer l3">Transition</div>
+  <div class="layer l4">Core Support</div>
+</div>
+<style>
+.pro-xray {
+  width: 220px;
+  height: 130px;
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 900px;
+  animation: proXray 11s ease-in-out infinite;
+}
+.pro-xray .layer {
+  position: absolute;
+  left: 0; right: 0;
+  height: 24px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  font: 600 11px system-ui;
+  letter-spacing: 0.06em;
+  color: #e0f7fa;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.28);
+}
+.pro-xray .l1 { top: 0; background: linear-gradient(90deg,#67e8f9,#22d3ee); transform: translateZ(48px); }
+.pro-xray .l2 { top: 32px; background: linear-gradient(90deg,#22d3ee,#0ea5e9); transform: translateZ(24px); }
+.pro-xray .l3 { top: 64px; background: linear-gradient(90deg,#0ea5e9,#0284c7); transform: translateZ(0); }
+.pro-xray .l4 { top: 96px; background: linear-gradient(90deg,#0284c7,#0c4a6e); transform: translateZ(-24px); }
+@keyframes proXray {
+  0%,100% { transform: rotateY(-10deg) rotateX(7deg); }
+  50% { transform: rotateY(10deg) rotateX(7deg); }
+}
+</style>
+```
+
+### 05 — Back Sleeper Character
+```html
+<div class="pro-back">
+  <div class="head"></div>
+  <div class="torso"></div>
+  <div class="legs"></div>
+</div>
+<style>
+.pro-back {
+  position: relative;
+  width: 72px;
+  height: 150px;
+  transform-style: preserve-3d;
+  animation: proBack 6s ease-in-out infinite;
+}
+.pro-back .head {
+  position: absolute;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 28%, #f0f9ff, #22d3ee);
+  top: 4px; left: 19px;
+  box-shadow: 0 0 20px rgba(34,211,238,0.4);
+}
+.pro-back .torso {
+  position: absolute;
+  width: 48px; height: 68px;
+  border-radius: 16px;
+  background: linear-gradient(#67e8f9, #22d3ee);
+  top: 38px; left: 12px;
+}
+.pro-back .legs {
+  position: absolute;
+  width: 44px; height: 42px;
+  border-radius: 12px;
+  background: #0ea5e9;
+  bottom: 0; left: 14px;
+}
+@keyframes proBack {
+  50% { transform: translateY(-8px) rotateX(-4deg); }
+}
+</style>
+```
+
+### 06 — Stomach Sleeper Character
+```html
+<div class="pro-stomach">
+  <div class="head"></div>
+  <div class="body"></div>
+</div>
+<style>
+.pro-stomach {
+  position: relative;
+  width: 190px;
+  height: 58px;
+  transform-style: preserve-3d;
+  animation: proStomach 6.2s ease-in-out infinite;
+}
+.pro-stomach .head {
+  position: absolute;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 28%, #f0f9ff, #22d3ee);
+  top: 10px; left: 18px;
+  box-shadow: 0 0 18px rgba(34,211,238,0.35);
+}
+.pro-stomach .body {
+  position: absolute;
+  width: 125px; height: 22px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #22d3ee, #0ea5e9);
+  top: 24px; left: 40px;
+}
+@keyframes proStomach {
+  50% { transform: translateY(-6px) rotateY(-6deg); }
+}
+</style>
+```
+
+### 07 — Rotating Sleep DNA Helix
+```html
+<div class="pro-dna">
+  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+</div>
+<style>
+.pro-dna {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  height: 120px;
+  transform-style: preserve-3d;
+  animation: proDna 9s linear infinite;
+}
+.pro-dna i {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: #22d3ee;
+  box-shadow: 0 0 14px #22d3ee;
+}
+.pro-dna i:nth-child(1) { transform: translateY(38px); }
+.pro-dna i:nth-child(2) { transform: translateY(22px); }
+.pro-dna i:nth-child(3) { transform: translateY(6px); }
+.pro-dna i:nth-child(4) { transform: translateY(-10px); }
+.pro-dna i:nth-child(5) { transform: translateY(-26px); }
+.pro-dna i:nth-child(6) { transform: translateY(-10px); }
+.pro-dna i:nth-child(7) { transform: translateY(6px); }
+.pro-dna i:nth-child(8) { transform: translateY(22px); }
+@keyframes proDna {
+  to { transform: rotateY(360deg); }
+}
+</style>
+```
+
+### 08 — 3D Pressure Relief Hand
+```html
+<div class="pro-pressure">
+  <div class="hand"></div>
+  <div class="surface"></div>
+</div>
+<style>
+.pro-pressure {
+  position: relative;
+  width: 170px;
+  height: 105px;
+  transform-style: preserve-3d;
+}
+.pro-pressure .surface {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 32px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #22d3ee, #0ea5e9);
+  box-shadow: 0 12px 32px rgba(34,211,238,0.3);
+}
+.pro-pressure .hand {
+  position: absolute;
+  width: 48px; height: 58px;
+  border-radius: 18px 18px 8px 8px;
+  background: linear-gradient(#e0f7fa, #67e8f9);
+  left: 61px; top: 12px;
+  transform-origin: bottom center;
+  animation: proPress 3.2s ease-in-out infinite;
+}
+@keyframes proPress {
+  0%,100% { transform: translateY(0) rotateX(0); }
+  50% { transform: translateY(20px) rotateX(14deg); }
+}
+</style>
+```
+
+### 09 — Professional Score Cube (Rotating)
+```html
+<div class="pro-cube">
+  <div class="face f1">92</div>
+  <div class="face f2">Match</div>
+  <div class="face f3">DNA</div>
+  <div class="face f4">Score</div>
+</div>
+<style>
+.pro-cube {
+  width: 96px; height: 96px;
+  position: relative;
+  margin: 55px auto;
+  transform-style: preserve-3d;
+  animation: proCube 11s linear infinite;
+}
+.pro-cube .face {
+  position: absolute;
+  width: 96px; height: 96px;
+  display: grid;
+  place-items: center;
+  font: 700 17px system-ui;
+  color: #e0f7fa;
+  background: linear-gradient(145deg, rgba(34,211,238,0.28), rgba(14,165,233,0.18));
+  border: 1px solid rgba(34,211,238,0.35);
+  backdrop-filter: blur(10px);
+}
+.pro-cube .f1 { transform: translateZ(48px); }
+.pro-cube .f2 { transform: rotateY(90deg) translateZ(48px); }
+.pro-cube .f3 { transform: rotateY(180deg) translateZ(48px); }
+.pro-cube .f4 { transform: rotateY(-90deg) translateZ(48px); }
+@keyframes proCube {
+  to { transform: rotateY(360deg) rotateX(12deg); }
+}
+</style>
+```
+
+### 10 — Human + Mattress Composition
+```html
+<div class="pro-pair">
+  <div class="mattress"></div>
+  <div class="human"></div>
+</div>
+<style>
+.pro-pair {
+  position: relative;
+  width: 230px;
+  height: 95px;
+  transform-style: preserve-3d;
+  animation: proPair 6.8s ease-in-out infinite;
+}
+.pro-pair .mattress {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 38px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #e0f7fa, #22d3ee 50%, #0ea5e9);
+  box-shadow: 0 18px 40px rgba(34,211,238,0.28);
+  transform: rotateX(7deg);
+}
+.pro-pair .human {
+  position: absolute;
+  width: 95px; height: 22px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #67e8f9, #22d3ee);
+  top: 28px; left: 55px;
+  box-shadow: 0 0 22px rgba(34,211,238,0.35);
+}
+@keyframes proPair {
+  50% { transform: translateY(-7px) rotateY(5deg); }
+}
+</style>
+```
+
+### 11 — Rotating Cooling Rings
+```html
+<div class="pro-cool">
+  <div class="ring r1"></div>
+  <div class="ring r2"></div>
+  <div class="ring r3"></div>
+</div>
+<style>
+.pro-cool {
+  position: relative;
+  width: 145px; height: 145px;
+  transform-style: preserve-3d;
+}
+.pro-cool .ring {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(34,211,238,0.4);
+  border-radius: 50%;
+}
+.pro-cool .r1 { animation: proCool 4.5s linear infinite; }
+.pro-cool .r2 { inset: 20px; border-color: rgba(103,232,249,0.5); animation: proCool 4.5s linear infinite reverse; }
+.pro-cool .r3 { inset: 40px; border-color: rgba(14,165,233,0.55); animation: proCool 3.2s linear infinite; }
+@keyframes proCool {
+  to { transform: rotateZ(360deg) rotateX(58deg); }
+}
+</style>
+```
+
+### 12 — Interactive 3D Tilt Mattress
+```html
+<div class="pro-tilt"
+  onpointermove="this.style.setProperty('--rx', ((event.offsetY/this.offsetHeight)-.5)*-16+'deg'); this.style.setProperty('--ry', ((event.offsetX/this.offsetWidth)-.5)*16+'deg')"
+  onpointerleave="this.style.setProperty('--rx','0deg'); this.style.setProperty('--ry','0deg')">
+  <div class="surface"></div>
+</div>
+<style>
+.pro-tilt {
+  width: 230px; height: 100px;
+  perspective: 900px;
+  display: grid;
+  place-items: center;
+}
+.pro-tilt .surface {
+  width: 210px; height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #e0f7fa, #22d3ee 50%, #0ea5e9);
+  box-shadow: 0 22px 45px rgba(34,211,238,0.3);
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.18s ease;
+}
+</style>
+```
+
+### 13 — Professional Reduced Motion Guard
+```html
+<style>
+@media (prefers-reduced-motion: reduce) {
+  .pro-mattress, .pro-side, .pro-orb .sphere, .pro-orb .ring,
+  .pro-xray, .pro-back, .pro-stomach, .pro-dna, .pro-pressure .hand,
+  .pro-cube, .pro-pair, .pro-cool .ring, .pro-tilt .surface {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+</style>
+```
+
+These graphics are production-oriented: consistent proportions, restrained motion, clean gradients, and precise sleep-position anatomy that match the site’s data-driven, professional aesthetic.
+
+Would you like any of these packaged as ready-to-use React components (with TypeScript + Tailwind) or combined into a single hero section? Just tell me the numbers.
